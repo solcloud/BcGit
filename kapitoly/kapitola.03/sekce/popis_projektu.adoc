@@ -1,0 +1,5 @@
+=== Popis praktického projektu
+
+Od následující sekce začneme tvořit zdrojové soubory pro praktickou ukázku využití nástroje Git {pomlcka} vlastní verzi známé hry Hadfootnote:[https://en.wikipedia.org/wiki/Snake_(video_game)], kterou nazveme *GitSnake*. Hra bude tvořena od samého začátku až do finální verze hry, ve které bude hratelná v libovolném moderním webovém prohlížeči.
+
+Projekt bude velice jednoduchý a slouží především jako ukázka použití Gitu než jako plnohodnotná hra. Zdrojové soubory projektu, jejímž autorem je autor této práce, budou jednoduché a měli by je být schopni pochopit i uživatelé, kteří nemají předešlé zkušenosti s programováním. Pro následování příkladu v této práci však není nutnost rozumět každému řádku zdrojového kódu, nejdůležitější je pochopení Gitu, což je hlavním cílem této práce.

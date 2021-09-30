@@ -1,0 +1,35 @@
+[[k_konvence]]
+=== Konvence
+
+Použité konvence v této práci:
+
+* Konzole {pomlcka} pro příkazový řádek či terminálový emulátor bude použito slovo konzole.
+* Git {pomlcka} pokud je v této práci odkazováno na program jako na celek, bude použito slovo Git (s velkým písmenem na začátku).
+* Git {pomlcka} použití výrazu git (s malým písmenem na začátku) bude odkazovat na spouštěcí soubor Gitu pro použití v konzoli, pokud nebude gramatika češtiny vyžadovat použití velkého počátečního písmena.
+
+Formát konzole v této práci používá následující konvence:
+
+* $ {pomlcka} všechny příkazy, které je třeba napsat do konzole, mají na začátku řádku symbol {lu}${pu}. Příkazy se potvrzují stiskem klávesy Enter (Return) po napsání posledního znaku příkazu.
+* # {pomlcka} symbol {lu}#{pu} na začátku řádku značí, že daný řádek je komentář. Text na řádku začínajícím tímto symbolem není třeba opisovat do konzole.
+
+<<<
+Pro zobrazení {lu}obrázku{pu} konzole bude v této práci použit následující formát:
+
+.Ukázka formátu konzole
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* příkaz --přepínač parametr
+# řádek s komentářem
+
+Běžný vstup či výstup konzole, ;; <1>
+který může být i na více řádku.
+----
+<1> Popis, který slouží pro bližší vysvětlení, co se na označeném řádku událo.
+====
+
+V této práci jsou využity následující typy konzolových příkazů:
+
+. Git příkazy {pomlcka} příkazy, které začínají slovem git, například `git status`. [1]
+. Unix příkazy {pomlcka} základní programy definované v __IEEE Std 1003.1-2008__, například `cat`. [2]
+. Příkazy interpretu konzole {pomlcka} vnitřní příkazy interpretu konzole, například `pwd`. V této práci je použit konzolový interpret Bourne Again Shell (Bash)footnote:[http://www.gnu.org/software/bash/], který je nastaven jako výchozí konzolový interpret na většině konzolí.

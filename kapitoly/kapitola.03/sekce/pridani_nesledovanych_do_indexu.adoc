@@ -1,0 +1,71 @@
+=== Přidání nesledovaných souborů do indexu
+
+Po provedení `git status` dostaneme následující výpis:
+
+.Git status s nesledovanými soubory
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git status
+On branch master
+
+Initial commit
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed) ;; <2>
+
+        README.txt ;; <1>
+
+nothing added to commit but untracked files present (use "git add" to track) ;; <3>
+----
+
+Oproti výpisu statusu v příkladu <<pr_git_status_empty>> se výpis trochu zvětšil (přibyla sekce **nesledované soubory** a došlo k drobným změnám na posledním řádku výpisu).
+
+<1> Nově vytvořený soubor v pracovním adresáři projektu __README.txt__ se nyní nachází v kategorií nesledované soubory.
+<2> Git napovídá, že pokud chceme tyto soubory (v tomto případě zatím pouze soubor __README.txt__) začít verzovat, máme použít příkaz `git add <název souboru>`, který daný soubor v pracovním adresáři projektu zkopíruje do indexu.
+<3> Poslední řádek říká, že Git neví o žádných souborech, které by mohl uložit do historie větve (v indexu nejsou žádné soubory), ale ví o souborech, které je možné přidat do indexu pomocí již zmiňovaného příkazu `git add`.
+====
+
+.Kategorie souborů (git status) [autor]
+image::gs_file_in_wd.svg["Kategorie souborů (git status) [autor\]",scaledwidth=80%]
+
+Opět dáme na radu Gitu a použijeme příkaz `git add <název souboru>` pro přidání do indexu. Vzhledem k tomu, že zatím máme pouze jeden soubor {pomlcka} _README.txt_, použijeme příkaz:
+
+.Přidání souboru do indexu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git add README.txt
+----
+====
+
+Po provedení příkazu Git nic nevypsal, což značí, že přidání do indexu bylo úspěšné. Pro kontrolu aktuálního stavu zadejme příkaz `git status`.
+
+.Git status se soubory v indexu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git status
+On branch master
+
+Initial commit
+
+Changes to be committed: ;; <1>
+  (use "git rm --cached <file>..." to unstage) ;; <2>
+
+        new file:   README.txt ;; <3>
+        
+----
+<1> Sekce s nesledovanými soubory zmizela a místo ní je zde sekce s názvem změny připravené k zapsání (*index*). Soubory v indexu (zatím stále pouze soubor _README.txt_) ukazují, jaké nové verze souborů budou uloženy do historie větve, pokud bude proveden commit.
+<2> Git nabízí možnost, kterou lze využít. Jedná se o příkaz `git rm --cached <název souboru>`, který odstraní daný soubor z indexu.
+<3> V indexu je soubor _README.txt_ připraven pro zapsání, který Git označil jako nový, neboť v __HEAD__ nebyl nalezen soubor s tímto názvem.
+====
+
+.Kategorie souborů (git status) [autor]
+image::gs_file_in_index.svg["Kategorie souborů (git status) [autor\]",scaledwidth=80%]

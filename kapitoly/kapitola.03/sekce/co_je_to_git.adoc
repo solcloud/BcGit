@@ -1,0 +1,3 @@
+Git je zdarma dostupný počítačový program s otevřeným zdrojovým kódem, licencovaný podle GPL-2.0 pro správu verzí souborů. [11] Git se zaměřuje především na správu textových souborů, ale díky jeho pevné vazbě na souborový systém lze v něm verzovat cokoli, co lze uložit do souborového systému. Git je distribuovaný verzovací systém s důrazem na rychlost, zachování integrity dat projektu a silnou podporu nelineárního vývoje. [11]
+
+Přestože existuje velké množství programů s grafickým uživatelským rozhraním postavených nad Gitem, nejlepší způsob jak využívat Git ve většině případů je pomocí konzole, která poskytuje univerzální rozhraní. Konzole byla proto zvolena jako hlavní prostředí pro praktickou práci s Gitem v této práci.

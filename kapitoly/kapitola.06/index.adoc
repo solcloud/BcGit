@@ -1,0 +1,68 @@
+== Shrnutí výsledků
+
+Teoretická část této práce byla věnována obecným informacím o verzovacích systémech, a především pak teorii okolo verzovacího systému Git.
+
+S teoretickou částí úzce souvisela praktická část, která se zaměřila na práci v systému Git od prvního otevření konzole a ověření správnosti nainstalování systému Git přes provedení 32 commitů až po závěrečné spuštění garbage collectoru pro údržbu repozitáře v roli vývojáře Boba.
+
+Celou tuto práci provázel praktický projekt _GitSnake_, který po přečtení práce a spuštění z pracovního adresáře projektu Boba vypadá například následovně:
+
+.Ukázka výsledného praktického projektu [autor]
+image::ukazkaProjektu.svg[Ukázka výsledného praktického projektu [autor\]",scaledwidth=90%]
+
+<<<
+Vytvořením tohoto praktického projektu vznikl následující graf historie projektu:
+
+.Výsledný graf projektu GitSnake
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git l
+*   a6eb3d8 (HEAD -> master, hlavni/master, hlavni/HEAD) Merge branch 'develop'
+|\
+| * c5d8060 (hlavni/develop, develop) README.txt přejmenováno na README.md
+| * 6116ead README převedeno do Markdown syntaxe
+| *   cecdaa4 Merge branch 'hotfix/snake-move' into develop
+| |\
+| | * 61fe963 Omezení nepovoleného pohybu hada
+| |/
+| *   411ce84 Merge branch 'feature/game-difficulty' into develop
+| |\
+| | * 13711f4 Ztížení hry po každých 5 bodech
+| * |   b62eae9 Merge branch 'feature/game-ui' into develop
+| |\ \
+| | |/
+| |/|
+| | * 80fdf41 Přidání textů UI
+| |/
+* | e433a7c (tag: v1.1.0) Omezení nepovoleného pohybu hada
+|/
+*   deb3b55 (tag: v1.0.0) Merge branches 'feature/collidable-entity' and 'feature/game-food' into develop
+|\
+| * e764ba8 Přidání jídla na náhodné pozici
+* | bce0dc8 Kolize entit s hlavou hada
+|/
+* 3103eff Přidání metod pro kolizi objektů
+* 7efeb7e Přidání .gitignore pro složku images
+* dd290f0 Vytvoření složky pro ukládání obrázků
+* c8ff334 Revert "Odstranění souboru play.htm"
+* e838400 Odstranění souboru play.htm
+* a0a0d97 (tag: v0.2.1) Oprava mazání plátna v Game.js:draw()
+* d448862 (tag: v0.2.0) Restart hry v případě výhry či prohry
+* ba70595 Ovládání hada pomocí šipek klávesnice
+* 07e8f32 Přidání turn metody ve SquareObject.js
+* c100627 Horizontální vycentrování plátna na stránce
+*   c0593d7 Merge branch 'feature/snake-grow' into develop
+|\
+| * e524045 Přidání grow(size) metody hada
+* | 38f1466 Play/Pause hry klávesou mezerník nebo ESC
+* | d9b576f Implementace animací objektů
+|/
+* b588ff6 Přidání základních objektů hada
+* dde6568 Přidání základního HTML kódu v play.htm
+* 33012c8 Přidání HTML5 hlavičky
+* ccf57ac Vytvoření základních souborů hry
+* d3173a9 (tag: v0.1.0) Přidání README projektu
+----
+====

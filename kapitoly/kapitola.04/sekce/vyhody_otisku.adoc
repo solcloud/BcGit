@@ -1,0 +1,98 @@
+=== Přidání souborů praktického projektu
+
+V minulé sekci jsme si rozebrali objekty, které byly vytvořeny v kapitole <<k_zaciname_s_gitem>>. V této sekci přidáme další soubory hry _GitSnake_ a také rozšíříme objektovou databázi. Jak již bylo řečeno, hra bude hratelná ve webovém prohlížeči, proto byla zvolena technologie pro publikování webových stránek, konkrétně značkovací jazyk **HTML**footnote:[https://www.w3.org/html/] (ve verzi 5) a programovací jazyk **ECMAScript**footnote:[http://www.ecma-international.org/publications/standards/Ecma-262.htm] (ve verzi 6) v implementaci **JavaScript**footnote:[https://cs.wikipedia.org/wiki/JavaScript]. Začneme vytvořením základních souborů hry v pracovním adresáři projektu:
+
+.Přidání souborů praktického projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* touch play.htm
+*$* mkdir js
+*$* touch js/Point2D.js js/SquareObject.js js/Snake.js js/Game.js
+----
+====
+
+Všechny vytvořené soubory v pracovním adresáři projektu přidáme do indexu. Pro přidání do indexu využijeme zástupné znaky konzolového interpretu:
+
+.Přidání všech .htm a .js souborů do indexu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git add *.htm *.js ;; <1>
+----
+<1> Příkazu `git add` byly předány {lu}dva{pu} parametry, které konzolový interpret převedl na aktuální cesty k souborům. První parametr specifikuje všechny _HTML_ soubory (přípona _.htm_) v pracovním adresáři projektu a druhý parametr všechny soubory _JavaScriptu_ (přípona _.js_).footnote:[Pro převedení zástupných znaků na aktuální cesty samotným Gitem je nutné použít uvozovky okolo parametrů.]
+====
+
+Při přidání do indexu Git vytváří objekty typu blob přidaných souborů. Vytvoření objektů typu blob můžeme ověřit:
+
+.Vyhledání souborů v objektové databázi
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* find .git/objects/ -type f
+.git/objects/5e/560c018223107e71f65cdb46fabd65d2889454
+.git/objects/7b/04950e85ed3557721a0ec6a7b94359488cfb0b
+.git/objects/d3/173a992e609a9b03f73239e15610987f11935e
+.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391 ;; <1>
+*$* git cat-file -t e69d
+blob ;; <2>
+----
+<1> V objektové databázi oproti výstupu v příkladu <<pr_go_first_commit>> přibyl pouze jeden objekt.
+<2> Nově vytvořený objekt je typu blob.
+====
+
+Výhoda tvorby otisku je ta, že pokud chceme uložit objekt, jehož otisk je již uložen v objektové databázi (obsahy jsou stejné), Git nemusí tento objekt ukládat znovufootnote:[Git tento objekt ani znovu uložit nemůže, neboť otisk je názvem souboru.], stačí, když Git odkáže na již vytvořený objekt pomocí otisku. Tímto způsobem dokáže Git efektivně ukládat soubory se stejným obsahem. Vzhledem k tomu, že všechny soubory byly vytvořeny pomocí příkazu `touch`, který mimo jiné vytvoří soubory s prázdným obsahem, pokud soubory s cestou předanou jako parametrem neexistují. Tedy všechny nově vytvořené soubory pomocí příkazu `touch` mají stejný (prázdný) obsah, proto se vytvořil pouze jeden objekt typu blob, na který odkazují dané cesty ve **virtuálním stromu v indexu**.
+
+=== Virtuální strom indexu
+
+Git sleduje primárně změny v obsazích souborů a k těmto obsahům přiřazuje názvy souborů jako sekundární údaj. Pro přiřazování názvů souborů k objektu typu blob, jak již víme, Git používá stromy. Kvůli častým změnám v indexu Git vytváří virtuální strom, který se ukládá spolu s dalšími informacemi ve zdrojovém souboru indexu (_.git/index_) a až v případě commitu, Git tento virtuální strom projde a vytvoří z něj objekty typu strom, které zapíše do objektové databáze spolu s objektem typu commit, který odkazuje na kořenový strom. Pro přibližné zobrazení virtuálního stromu indexu lze použít příkaz `git ls-&#xFEFF;files --stage`.
+
+Pomocí příkazu z jádra Gitu {pomlcka} `git write-tree` můžeme instruovat Git, aby aktuální virtuální strom v indexu převedl a uložil do objektové databáze. Výsledkem příkazu `git write-tree` je otisk kořenového stromu. Pomocí otisku kořenového stromu můžeme vytvořit commit, například pomocí příkazu opět z jádra Gitu {pomlcka} `git commit-tree`. Pro zjednodušení ovšem použijeme rovnou uživatelský příkaz `git commit`, který provede vše v jednom příkazu:
+
+.Vytvoření základních souborů hry
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git commit -m "Vytvoření základních souborů hry"
+[master ccf57ac] Vytvoření základních souborů hry
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 js/Game.js
+ create mode 100644 js/Point2D.js
+ create mode 100644 js/Snake.js
+ create mode 100644 js/SquareObject.js
+ create mode 100644 play.htm
+----
+====
+
+Commit proběhl v pořádku, bylo přidáno 5 souborů a nepřibyly žádné řádky (všechny přidané soubory mají prázdný obsah). Pro lepší ukázku znovu použitelnosti objektů se stejným obsahem změníme pouze obsah souboru _play.htm_ v kořenovém adresáři a provedeme commit. Pro commit použijeme možnost předat příkazu `git commit` jako parametr názvy sledovaných změněných souborů, které chceme __commit__nout. Takto definovaný příkaz ignoruje index, tedy v commitu budou změněny pouze soubory v parametru tak, jak jsou uloženy v pracovním adresáři projektu:
+
+[[pr_chtml5]]
+.Přidání HTML5 hlavičky
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* echo -n '<!DOCTYPE html>' > play.htm ;; <1>
+*$* git commit -m "Přidání HTML5 hlavičky" play.htm
+[master 33012c8] Přidání HTML5 hlavičky
+ 1 file changed, 1 insertion(+)
+----
+<1> Uložení textu _<!DOCTYPE html>_ do souboru _play.htm_.
+====
+
+V příkladu <<pr_chtml5>> došlo ke změně pouze jednoho blob objektu a daného kořenového stromu. Ve složce _js_ se v commitu z příkladu <<pr_chtml5>> nic nezměnilo, proto otisk stromu adresáře _js_ je stejný jako v commitu předešlém a nově vytvořený kořenový strom pouze odkáže na objekty již uložené v objektové databázi (viz obrázek <<img_object_store>>).
+
+[[img_object_store]]
+.Objektová databáze (zjednodušeno) [autor]
+image::objectstore.svg[Objektová databáze (zjednodušeno) [autor\]",scaledwidth=100%]
+
+Pro získání příslušné adresářové struktury v commitu stačí Gitu pouze odkaz na commit, pomocí kterého již Git nalezne všechny objekty související s tímto commitem. V následujících kapitolách proto budou v grafickém vyjádření historie projektu pro zjednodušení použity pouze objekty typu commit.

@@ -1,0 +1,15 @@
+[[k_prikazy_gitu]]
+== Příkazy Gitu a související akce
+
+V minulé sekci byl podrobně rozebrán princip Gitu. V této kapitole budou probrány základní příkazy pro práci s Gitem.
+
+include::sekce/draft.5.1.adoc[]
+
+include::sekce/draft.5.2.adoc[]
+
+include::sekce/draft.5.3.adoc[]
+
+
+////
+Git tracks content instead of files. - VersionControlWithGit
+////

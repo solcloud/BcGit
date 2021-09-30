@@ -1,0 +1,10 @@
+[[k_historie]]
+=== Historie verzovacích systémů
+
+Jelikož historie verzovacích systémů je dosti složitá, na následujících řádcích budou vypsány pouze stručně milníky tohoto tématu. Historie bude rozdělena do tří generací podle [3][4].
+
+Téma verzovacích systémů se stalo populární v 70. letech 20. století. Vše začal systém s názvem __Source Code Control System (SCCS)__, vytvořený v Bellových laboratořích roku 1972. Jeho autorem je _Marc Rochkind_. [5] Tento systém je považován za první populární verzovací systém, i když první svého druhu nebyl. Koncept vln a jednoznačně identifikovaných verzí systému SCCS lze najít i v dnešních verzovacích systémech. [4] Na úspěch systému SCCS navázal v roce 1982 systém __Revision Control System (RCS)__, jehož autorem je _Walter F. Tichy_. [6] Uvedený systém byl alternativou pro populární _SCCS_. Tyto dva systémy jsou zástupci tzv. první generace verzovacích systémů. První generace je známá pro verzování jednotlivých souborů, centralizovaným přístupem k repozitáři a možnosti upravovat jednotlivé soubory pouze jedním uživatelem pomocí techniky zámku souboru. [3][4]
+
+Za průkopníka druhé generace je považován Concurrent Version System (CVS), který vytvořil v roce 1985 Dick Grune. [7] CVS bylo považováno de facto za lídra verzovacích systému té doby, a to až do roku 2000, kdy vznikl systém Subversion (SVN), vytvořený firmou CollabNet. [8] Druhá generace se vyznačuje prací více uživatelů na stejných souborech, podporou pro nelineární vývoj a centralizovaným řešením přístupu k repozitáři.
+
+Třetí generace používá distribuované řešení přístupu k repozitáři a také vylepšuje podporu pro nelineární vývoj projektu. Mezi hlavní zástupce patří Git, kterému se blíže věnuje tato práce. Git vznikl v roce 2005 a jeho autorem je Linus Torvalds. [9] Dalším zástupcem je Mercurial, který také vznikl v roce 2005, autorem je Matt Mackall. [10]

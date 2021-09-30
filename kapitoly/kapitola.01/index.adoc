@@ -1,0 +1,14 @@
+[[k_uvod]]
+== Úvod
+
+Každý jistě někdy při používání počítače využil možnost vrátit se o krok zpět. Například jsme při psaní textu udělali chybu a po zjištění této chyby jsme klikli na tlačítko _ZPĚT_ pro vrácení do stavu před chybou. Pokud jsme chybu objevili až po sérií úprav od napsání dané chyby, případně po znovuotevření souboru, nejspíše jsme narazili na problém, že na tlačítko _ZPĚT_ lze kliknout pouze několikrát, případně vůbec. V takovéto chvíli jsme si jistě přáli mít neomezený počet vrácení historie souboru. Systém pro správu verzí nás nejen v takovýchto situacích může zachránit.
+
+Systém pro správu verzí umožňuje ukládat změny provedené v souboru (souborech) v průběhu času. Mezi další přednosti patří možnost prohlížet a vracet se k původním verzím souborů, porovnávat změny v souborech, spolupráci v týmu lidí a mnoho dalšího. Systém pro správu verzí umožňuje uživateli upravit soubor bez obav o ztrátu předchozí verze. Nechtěné úpravy, případně odstranění lze snadno navrátit nejen do stavu před úpravou či odstraněním, ale do jakéhokoli stavu, který je v systému uložen.
+
+Systém pro správu verzí je nepostradatelnou součástí vývoje každého softwaru, pro tento účel byly tyto systémy primárně navrženy, ale i například pro designéra vytvářejícího grafiku nebo skladatele hudby je neocenitelným pomocníkem ve sledování historie (vývoje) digitálního projektu. Systém pro správu verzí je použit i při psaní této práce.
+
+Cílem této práce je podat čtenáři obecné informace o systémech pro správu verzí a následně bližší seznámení se systémem Git.
+
+V kapitole <<k_zaciname_s_vcs>> budou vysvětleny základní pojmy, rozdělení a krátká historie systému pro správu verzí. V kapitole <<k_zaciname_s_gitem>> bude představen systém Git a základní práce v tomto systému. V kapitole <<k_princip_gitu>> bude podrobněji rozebrán princip systému Git. V kapitole <<k_prikazy_gitu>> budou probrány příkazy Gitu a související akce pro dokončení praktického projektu.
+
+include::sekce/konvence.adoc[]

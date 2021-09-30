@@ -1,0 +1,22 @@
+=== Vytvoření pracovního adresáře projektu
+
+Prvním krokem je vytvoření pracovního adresáře projektu pro uchování dat projektu. Složku projektu pojmenujeme __git_snake__. Tuto složku vytvoříme na _Ploše_ našeho operačního systému následovně:
+
+Změníme pracovní adresář konzole na zvolené umístění pro ukládání dat projektu {pomlcka} _Plocha_ operačního systému. Ke změně pracovního adresáře konzole využijeme příkaz konzolového interpretu {pomlcka} `cd`. Nejjednodušší způsob jak se dostat na _Plochu_ je pomocí *~* (vlnovka nebo též tilda). Tento znak zastupuje domovský adresář. Nejčastěji je _Plocha_ (*Desktop*) umístěna právě v domovském adresáři, proto se na _Plochu_ dostaneme pomocí příkazu `cd ~/Desktop`. Jakmile je pracovní adresář konzole na _Ploše_, stačí zde vytvořit novou složku __git_snake__ pomocí příkazu `mkdir`, která bude sloužit jako pracovní adresář projektu _GitSnake_. Jakmile je složka vytvořená, změníme pracovní adresář konzole na nově vytvořenou složku pomocí příkazu `cd`.
+
+.Vytvoření pracovního adresáře projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+# Pracovní adresář konzole změníme na Plochu
+*$* cd ~/Desktop
+# Vytvoříme složku git_snake
+*$* mkdir "git_snake"
+# Změníme pracovní adresář konzole
+*$* cd git_snake
+----
+====
+
+Uvozovky u "git_snake" nejsou povinné, pokud název neobsahuje mezery nebo speciální znaky rozeznatelné konzolí. Obecně není doporučeno používat mezery, speciální znaky a českou diakritiku v názvech souborů (či adresářů) projektu.
+
+Další příklady předpokládají, pokud není uvedeno jinak, že pracovní adresář konzole je vždy v tomto umístění (__{snake}__),  pokud si čtenář zvolí jiné umístění, je nutné zaměnit __{snake}__ za čtenářem definované umístění. Pro přehled však v každé ukázce konzole bude na prvním řádku použit příkaz `pwd`, který slouží k výpisu absolutní cesty k aktuálnímu pracovnímu adresáři konzole.

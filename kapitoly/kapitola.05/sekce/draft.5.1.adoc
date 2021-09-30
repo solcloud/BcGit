@@ -1,0 +1,617 @@
+V textovém editoru otevřeme soubor _Point2D.js_ ze složky _js_ projektu _GitSnake_ a upravíme obsah, aby vypadal následovně:
+
+.js/Point2D.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.Point2D = class Point2D {
+    constructor(x, y) {
+        this.x = x; this.y = y;
+    }
+}**
+....
+
+=== Diff
+
+Program `diff` slouží, ve výchozím nastavení, pro vypsání rozdílů jednotlivých *řádků* mezi dvěma soubory. Program `diff` je základní program definovaný v [2], ale kvůli lepší podpoře operačních systému a spolupráce s Gitem je program `git diff` součástí Gitu.footnote:[Pro spuštění externího nástroje pro zobrazení rozdílu lze použít příkaz `git difftool`.] Pro zobrazení rozdílu mezi sledovanými soubory v pracovním adresáři projektu a sledovanými soubory v indexu použijeme příkaz `git diff`. Po zobrazení rozdílu (*diffu*) přidáme soubor _Point2D.js_ do indexu.
+
+[[pr_diff_normal]]
+.Zobrazení rozdílu, který lze přidat do indexu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git diff
+diff --git a/js/Point2D.js b/js/Point2D.js ;; <1>
+index e69de29..3b8b34b 100644 ;; <2>
+--- a/js/Point2D.js
++++ b/js/Point2D.js
+@@ -0,0 +1,6 @@
++"use strict";
++GitSnake.Point2D = class Point2D {
++    constructor(x, y) {
++        this.x = x; this.y = y; ;; <3>
++    }
++}
+\ No newline at end of file ;; <4>
+*$* git add js/Point2D.js
+----
+<1> Spuštění programu `git diff` pro dva soubory (verze _A_ a __B__ souboru _js/Point2D.js_).
+<2> Verze _A_ je blob {lu}e69de29{pu} (prázdný obsah) v indexu a verze _B_ je blob {lu}3b8b34b{pu} (nově přidaný obsah) v pracovním adresáři projektu.
+<3> Ve výstupu příkazu `git diff` jsou jednotlivé *přidané* řádky označeny na začátku symbolem *+* a *odstraněné* řádky symbolem *-*.
+<4> Upozornění, že na konci souboru není odřádkováno. Obecně je doporučeno, pokud to zdrojový soubor dovoluje, na konci souboru odřádkovat pro předcházení konfliktům (více o konfliktu v kapitole <<k_konflikt>>).
+====
+
+V pracovním adresáři projektu jsme změnili pouze sledovaný soubor _Point2D.js_, proto ve výstupu příkladu <<pr_diff_normal>> je vypsán změněný obsah tohoto souboru oproti verzi tohoto souboru uložené v indexu. Nyní opět změníme obsah souboru _Point2D.js_ v pracovním adresáři projektu a provedeme opět příkaz `git diff`:
+
+.js/Point2D.js
+[subs=+quotes]
+....
+    constructor(x, y) {
+        this.x = x; this.y = y;
+    }
+    **copy() {
+        return new GitSnake.Point2D(this.x, this.y);
+    }**
+}
+....
+
+[[pr_diff_copy]]
+.Zobrazení rozdílu, který lze přidat do indexu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git diff
+diff --git a/js/Point2D.js b/js/Point2D.js
+index 3b8b34b..20c9bf3 100644
+--- a/js/Point2D.js
++++ b/js/Point2D.js
+@@ -3,4 +3,7 @@ GitSnake.Point2D = class Point2D {
+     constructor(x, y) {
+         this.x = x; this.y = y;
+     }
++    copy() {
++        return new GitSnake.Point2D(this.x, this.y);
++    }
+ }
+\ No newline at end of file
+----
+====
+
+Výstupem příkazu <<pr_diff_copy>> je nově přidaný obsah (metoda _copy_). Příkaz `git diff --staged` slouží pro zobrazení rozdílu mezi indexem a __HEAD__, tedy tento příkaz ukazuje změny, které budou v commitu, pokud se provede příkaz `git commit` oproti commitu předešlém. `Git diff` lze použít k porovnání libovolných dvou objektů, například k zobrazení _diffu_ mezi commity, na které ukazují větve _master_ a __develop__, lze použít příkaz `git diff master develop`. Program `diff` zobrazuje změny souboru _B_ oproti souboru _A_, záleží tedy na pořadí parametrů, proto je dobré jako první parametr _A_ použít objekt, který je {lu}starší{pu} než objekt _B_. Pro vytváření {lu}pěkných{pu} _diffů_ a přehledného kódu je doporučeno oddělovat jednotlivé části zdrojových kódů pomocí nového řádku, ovšem v této práci kvůli ušetření místa nebude toto doporučení striktně dodržováno. Nápomocný je také přepínač __--check__ příkazu `git diff`, který slouží k zjištění přebytečných bílých znaků v __diffu__.
+
+=== Základní obsah souborů praktického projektu
+
+Upravíme následující soubory:
+
+.js/SquareObject.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.SquareObject = class SquareObject {
+    constructor(pos) {
+        this.position = pos; this.color = "red"; this.size = this.constructor.size;
+        this.velocity = new GitSnake.Point2D(0, 0); this.collidable = true;
+    } draw(ctx) {
+        ctx.fillStyle = this.color; var tp = this.position; ctx.strokeStyle = "white";
+        ctx.fillRect(tp.x * this.size, tp.y * this.size, this.size, this.size);
+        ctx.strokeRect(tp.x * this.size, tp.y * this.size, this.size, this.size);
+    }
+}
+GitSnake.SquareObject.size = 1;**
+....
+
+.js/Snake.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.Snake = class Snake extends GitSnake.SquareObject {
+    constructor(pos) {
+        super(pos); this.velocity.x = 1;
+        this.tail = [new GitSnake.SquareObject(new GitSnake.Point2D(pos.x - 1, pos.y))];
+        this.length = 1 + this.tail.length; this.color = "green";
+    } draw(ctx) {
+        this.tail.forEach(function (chunk) {
+            chunk.draw(ctx);
+        }); super.draw(ctx);
+    }
+}**
+....
+
+.js/Game.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.Game = class Game {
+    constructor(canvas, tileSize, drawFPS = 60) {
+        this.width = canvas.width; this.height = canvas.height;
+        this.ctx = canvas.getContext("2d"); this.animationSpeed = 100;
+        this.drawingSpeed = Math.ceil(1000 / drawFPS); this.drawingId;
+        this.tileX = Math.floor(this.width / tileSize); this.animationId;
+        this.tileY = Math.floor(this.height / tileSize);
+        GitSnake.SquareObject.size = tileSize; this.gameObjects = [];
+        this.isPlaying = false; this.isGameOver = false; this.score = 0;
+        
+        this.snake = new GitSnake.Snake(new GitSnake.Point2D(0, 0));
+        this.addEntity(this.snake);
+    } addEntity(entity) {
+        this.gameObjects.push(entity);
+    } draw() {
+        this.gameObjects.forEach(function (entity) {
+            entity.draw(this.ctx);
+        }, this);
+    }
+}**
+....
+
+.play.htm
+[subs=+quotes]
+....
+    <canvas width="600" height="300" id="canvas">Váš prohlížeč není podporován</canvas>
+    **<script>window.GitSnake = {};</script><script src="js/Point2D.js"></script>
+    <script src="js/SquareObject.js"></script><script src="js/Snake.js"></script>
+    <script src="js/Game.js"></script>
+    <script>
+        (function () {
+            var game = new GitSnake.Game(document.getElementById("canvas"), 20, 30);
+            game.draw();
+        })();
+    </script>**
+</body>
+....
+
+Po úpravě a uložení všech souborů otevřeme soubor _play.htm_ v moderním webovém prohlížeči a zkontrolujeme, zdali se v okně webového prohlížeče zobrazil jeden zelený čtverec (hlava hada) v levé horní části černého rámečku (plátno). Po kontrole provedeme commit, kde využijeme přidání přepínače _-a_ příkazu `git commit`, který přidá všechny změněné sledované soubory projektu do indexu a provede commit:
+
+.Přidání základních objektů hada
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git commit -a -m "Přidání základních objektů hada"
+[develop b588ff6] Přidání základních objektů hada
+ 5 files changed, 63 insertions(+)
+----
+====
+
+[[k_jak_spravne_psat_commitmsg]]
+=== Konvence pro psaní popisů změn
+
+Dosud jsme vždycky v této práci pro specifikování popisu změny použili přepínač _-m_ příkazu `git commit`. Přepínač _-m_ se hodí pro krátké popisy změn, ovšem popis změn může (a měl by) být podrobný, tedy na více řádcích. Pro vytvoření popisu změny na více řádcích můžeme použít více přepínačů __-&#xFEFF;m__ nebo úplně vynechat přepínač _-m_, přičemž Git otevře textový editor pro napsání popisu změny. Git otevře textový editor definovaný v nastavení Gitu (klíč _core.editor_) nebo editor definovaný v proměnných prostředí operačního systému (__$GIT_EDITOR__, _$EDITOR_, _$VISUAL_), případně editor __vim__footnote:[http://www.vim.org/], pokud v předešlých umístěních Git nic nenalezne. Pro rychlý kurz práce v editoru _vim_ můžeme spustit tutoriál příkazem `vimtutor`.
+
+Popis změny v Gitu je nepovinný, i když doporučený, ovšem pokud napíšeme jeden znak nebo tisíc už Git nezajímá a je jen pouze na nás, jak kvalitně popíšeme změny v commitu.footnote:[Ukázky špatných popisů změn lze najít například na adrese http://www.commitlogsfromlastnight.com/.] Pro popis změn je důležité na první řádek napsat hlavní shrnutí změny (*předmět*). Tento první řádek se vypisuje v mnoha příkazech Gitu, například `git log --oneline`. Po napsání předmětu změny je nutné dvakrát odřádkovat a napsat podrobnější popis změny (viz příklad <<pr_jak_commitovat>>). [19]
+
+[[pr_jak_commitovat]]
+.Ukázka doporučení pro psaní popisů změn [19]
+====
+[source,subs="verbatim,attributes"]
+----
+Summarize changes in around 50 characters or less
+
+More detailed explanatory text, if necessary. Wrap it to about 72
+characters or so. In some contexts, the first line is treated as the
+subject of the commit and the rest of the text as the body. The
+blank line separating the summary from the body is critical (unless
+you omit the body entirely); various tools like `log`, `shortlog`
+and `rebase` can get confused if you run the two together.
+
+Explain the problem that this commit is solving. Focus on why you
+are making this change as opposed to how (the code explains that).
+Are there side effects or other unintuitive consequenses of this
+change? Here's the place to explain them.
+
+Further paragraphs come after blank lines.
+
+ - Bullet points are okay, too
+
+ - Typically a hyphen or asterisk is used for the bullet, preceded
+   by a single space, with blank lines in between, but conventions
+   vary here
+
+If you use an issue tracker, put references to them at the bottom,
+like this:
+
+Resolves: #123
+See also: #456, #789
+----
+====
+
+=== Průběh práce
+
+Průběh práce (*workflow*) v Gitu je často diskutované téma. Git nevyžaduje používání určitého workflow a je tedy na uživateli, aby si vybral, jaké workflow mu nejvíce vyhovuje. Populární workflow je **GitFlow**footnote:[http://nvie.com/posts/a-successful-git-branching-model/], které používá pro každou vyvíjenou část projektu (*feature*) vlastní větev. Upravené _GitFlow_ bude použito v této práci.
+
+Projekt _GitSnake_ kromě vykreslení hlavy hada zatím moc neumí, proto by bylo dobré přidat další funkce hry, například růst hada a základní animaci objektů. Pro růst hada vytvoříme novou větev s názvem _feature/snake-grow_ a pro implementování animací objektů vytvoříme novou větev s názvem _feature/&#xFEFF;animate_ a do této nově vytvořené větve se přepneme:
+
+[[pr_vytvoreni_feature_branch]]
+.Vytvoření feature větví a přepnutí na větev feature/animate
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git branch feature/snake-grow
+*$* git checkout -b feature/animate ;; <1>
+Switched to a new branch 'feature/animate'
+----
+<1> Příkaz `git checkout -b <název větve>` je zkratka pro spuštění příkazu `git branch <název větve>` a `git checkout <název větve>` po sobě.
+====
+
+Po přepnutí na nově vytvořenou větev upravíme následující soubory projektu:
+
+.js/Point2D.js
+[subs=+quotes]
+....
+    copy() {
+        return new GitSnake.Point2D(this.x, this.y);
+    } **setTo(point) {
+        this.x = point.x; this.y = point.y;
+    } equals(point) {
+        return (this.x === point.x && this.y === point.y);
+    }**
+}
+....
+
+.js/SquareObject.js
+[subs=+quotes]
+....
+        ctx.strokeRect(tp.x * this.size, tp.y * this.size, this.size, this.size);
+    }** animate() {
+        this.position.x += this.velocity.x; this.position.y += this.velocity.y;
+    }**
+}
+GitSnake.SquareObject.size = 1;
+....
+
+.js/Snake.js
+[subs=+quotes]
+....
+    } draw(ctx) {
+        this.tail.forEach(function (chunk) {
+            chunk.draw(ctx);
+        }); super.draw(ctx);
+    }** animate() {
+        var lastChunk = this.tail.pop(); this.tail.unshift(lastChunk);
+        lastChunk.position.setTo(this.position); super.animate();
+    }**
+}
+....
+
+.js/Game.js
+[subs=+quotes]
+....
+    } draw() {
+        this.gameObjects.forEach(function (entity) {
+            entity.draw(this.ctx);
+        }, this);
+    } **animate() {
+        this.gameObjects.forEach(function (entity) {
+            entity.animate();
+        }, this);
+    } play() {
+        if (!this.isPlaying && !this.isGameOver) {
+            this.isPlaying = true; var game = this;
+            this.drawingId = setInterval(function () {
+                game.draw();
+            }, this.drawingSpeed);
+            this.animationId = setInterval(function () {
+                game.animate();
+            }, this.animationSpeed);
+        }
+    } pause() {
+        this.isPlaying = false;
+        clearInterval(this.drawingId); clearInterval(this.animationId);
+    }**
+}
+....
+
+.play.htm
+[subs=+quotes]
+....
+    (function () {
+        var game = new GitSnake.Game(document.getElementById("canvas"), 20, 30);
+        **
+        window.addEventListener("keydown", function (e) {
+                switch (e.keyCode) {
+                    case 27: case 32:
+                        if (game.isPlaying) {
+                            game.pause();
+                        } else {
+                            game.play();
+                        }
+                } e.preventDefault();
+        });**
+    })();
+</script>
+....
+
+Po úpravě a vyzkoušení, že se hra při stisku klávesy _mezerník_ nebo _Esc_ spustí, případně pozastaví a že se had pohybuje doprava v okně webového prohlížeče, provedeme commit. Commity by ovšem měly být *atomické*, tzn., že by měly přinášet jednotnou změnu. Aktuální změněné soubory ovšem přidaly kromě souvislé změny v logice hry i ovládání pomocí klávesnice, a proto provedeme commity dva. První commit se všemi změněnými soubory kromě souboru _play.htm_ a druhý commit pouze se souborem _play.htm_. Díky tomu, že Git obsahuje index, si můžeme do indexu přidat pouze všechny soubory ze složky _js_ a ty __commit__nout a v dalším commitu přidat do indexu pouze soubor _play.htm_:
+
+.Implementace animací hry a možnosti pozastavit hru
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git add js/
+*$* git commit -m "Implementace animací objektů"
+[feature/animate d9b576f] Implementace animací objektů
+ 4 files changed, 26 insertions(+)
+*$* git add play.htm
+*$* git commit -m "Play/Pause hry klávesou mezerník nebo ESC"
+[feature/animate 38f1466] Play/Pause hry klávesou mezerník nebo ESC
+ 1 file changed, 11 insertions(+), 1 deletions(-)
+----
+====
+
+=== Checkout
+
+Již víme, že příkaz `git checkout <commit>` slouží pro změnu odkazu _HEAD_. Kromě změny odkazu _HEAD_ ještě příkaz `git checkout` při spuštění zajistí, že pracovní adresář projektu bude vypadat tak, jak byl uložen v commitu (stromě) předaném v parametru. Pokud provedeme _checkout_ větve _master_, tak se všechny sledované soubory v pracovním adresáři projektu smažou a nahradí se soubory, které jsou uloženy v commitu, na který _master_ odkazuje.
+
+.Přepnutí na větev master
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git checkout master
+Switched to branch 'master'
+*$* cat play.htm
+<!DOCTYPE html> ;; <1>
+----
+<1> Obsah souboru _play.htm_ v pracovním adresáři projektu je stejný jako v commitu, na který _master_ odkazuje.
+====
+
+Mizení souborů z pracovního adresáře projektu spoustu lidí vystraší, ale musíme si uvědomit, že pracovní adresář projektu je pouze **pracovní kopie** a důležitá jsou data v repozitáři. Kvůli nahrazení souborů v pracovním adresáři projektu je dobré spouštět příkaz `git checkout` v čistém pracovním adresáři projektu, i když Git vypíše varování a zabrání přepnutí na specifikovaný commit, pokud by mělo dojít k přepsání změn v souborech. V případě špinavého pracovního adresáře projektu lze využít příkaz `git stash` nebo `git worktree`. 
+
+=== Merge
+
+Pokud chceme určitou větev začlenit (sjednotit) do větve jiné, použijeme příkaz `git merge`. Sjednocení (*merge*) větví je v Gitu jednoduché, neboť větev v Gitu je pouze ukazatel na commit a commity vytváří orientovaný acyklický graf. Přesto v Gitu existuje několik možností (strategií) pro začlenění a také je možné vytvářet vlastní strategie.
+
+==== Fast-forward strategie
+
+Nejjednodušší sjednocovací strategie je _fast-forward_, která funguje nejlépe pro lineární vývoj a je to také doporučená strategie, pokud chceme začlenit naše změny do jiného repozitáře. _Fast-forward_ strategii lze použít, pokud začleňujeme větev _F_ do větve _D_, kde commit _D_ je libovolný předchůdce commitu _F_. Pro ukázku _fast-forward_ začlenění použijeme větev _develop_ a z této větve {lu}pokračující{pu} větev __feature/&#xFEFF;animate__ (viz obrázek <<img_ff_before>>).
+
+[[img_ff_before]]
+.Historie před začleněním [autor]
+image::ff-before.svg[Historie před začleněním [autor\]",scaledwidth=60%]
+
+.Začlenění větve
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git checkout develop ;; <1>
+Switched to branch 'develop'
+*$* git merge feature/animate ;; <2>
+Updating b588ff6..38f1466
+Fast-forward ;; <3>
+ js/Game.js         | 17 +++++++++++++++++
+ js/Point2D.js      |  4 ++++
+ js/Snake.js        |  3 +++
+ js/SquareObject.js |  2 ++
+ play.htm           | 12 +++++++++++-
+ 5 files changed, 37 insertions(+), 1 deletions(-) ;; <4>
+*$* git branch -d feature/animate ;; <5>
+Deleted branch feature/animate (was 38f1466).
+----
+<1> Pro začlenění je nutné se nejprve přepnout na větev, kterou chceme aktualizovat.
+<2> Příkazu `git merge` jsme předali větev, kterou chceme začlenit do větve _develop_.
+<3> Začlenění proběhlo pomocí _fast-forward_ strategie.
+<4> Souhrn, jaké změny byly provedeny (`git diff --stat b588ff6 38f1466`). Tento výpis se označuje __diffstat__footnote:[http://invisible-island.net/diffstat/diffstat.html].
+<5> Po začlenění větve _feature/animate_ do větve _develop_ můžeme tuto větev smazat (__-d__), neboť již není potřeba (Git smaže *pouze* referenci této větve).
+====
+
+Po provedení začlenění větev _develop_ odkazuje na stejný commit, na který odkazovala větev __feature/&#xFEFF;animate__ před smazáním (viz obrázek <<img_ff_after>>).
+
+[[img_ff_after]]
+.Historie po začlenění [autor]
+image::ff-after.svg[Historie po začlenění [autor\]",scaledwidth=60%]
+
+==== Rekurzivní strategie
+
+Rekurzivní strategie se používá pro sjednocení *dvou* větví, kde jedna větev není předchůdce druhé větve. V takovém případě nelze použít _fast-forward_ strategii, ale je nutno vytvořit nový commit, který bude mít *dva* rodiče (commity, na které odkazují obě sjednocované větve). Výhodou rekurzivní strategie oproti _fast-forward_ je, že ve vytvořeném commitu jsou uloženy odkazy na rodiče, tedy je zde uložena informace o tom, že tento commit vznikl spojením dvou větví a po smazání odkazů původních větví tyto větve můžeme v budoucnu kdykoli znovu vytvořit a pokračovat ve vývoji těchto větví. Dokonce můžeme tyto větve v budoucnu znovu sloučit. Nevýhodou rekurzivní strategie je, že již nemáme pouze lineární historii projektu.
+
+Pro ukázku rekurzivní strategie použijeme větev _feature/snake-grow_ vytvořenou v příkladu <<pr_vytvoreni_feature_branch>>:
+
+.Přepnutí na větev feature/snake-grow
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git checkout feature/snake-grow
+Switched to branch 'feature/snake-grow'
+----
+====
+
+Upravíme následující soubor:
+
+.js/Snake.js
+[subs=+quotes]
+....
+        this.tail = [new GitSnake.SquareObject(new GitSnake.Point2D(pos.x - 1, pos.y))];
+        this.length = 1 + this.tail.length; this.color = "green";
+    }** grow(size) {
+        this.length += size; var lastChunk = this.tail[this.tail.length - 1];
+        for (var i = 1; i <= size; i++) {
+            this.tail.push(new GitSnake.SquareObject(lastChunk.position.copy()));
+        }
+    }** draw(ctx) {
+        this.tail.forEach(function (chunk) {
+}
+....
+
+Po uložení provedeme commit a následně se přepneme na větev _develop_, kde provedeme sjednocení s větví _feature/snake-grow_. Obrázek <<img_recursive_before>> ukazuje stav po provedení commitu.
+
+[[img_recursive_before]]
+.Historie před začleněním [autor]
+image::recursive-before.svg[Historie před začleněním [autor\]",scaledwidth=75%]
+
+.Rekurzivní začlenění
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git commit -m "Přidání grow(size) metody hada" js/Snake.js
+[feature/snake-grow e524045] Přidání grow(size) metody hada
+ 1 file changed, 5 insertions(+)
+*$* git checkout develop
+Switched to branch 'develop'
+*$* git merge feature/snake-grow ;; <1>
+Auto-merging js/Snake.js ;; <2>
+Merge made by the 'recursive' strategy. ;; <3>
+ js/Snake.js | 5 +++++
+ 1 file changed, 5 insertions(+)
+*$* git branch -d feature/snake-grow
+Deleted branch feature/snake-grow (was e524045). 
+----
+<1> Příkazu `git merge` jsme nepředali přepínač _-m_ pro specifikování popisu změny, proto Git otevřel editor a vyplnit výchozí popis změny __{lu}Merge branch 'feature/snake-grow' into develop{pu}__. Tento výchozí popis změny můžeme ponechat tak, jak je, anebo upravit. Jakmile jsme spokojeni s popisem změny, uložíme soubor a zavřeme okno editoru.
+<2> Soubor _js/Snake.js_ byl změněn jak ve větvi _feature/snake-grow_, tak také ve větvi _develop_ oproti verzi tohoto souboru ve společném předkovi těchto větví, proto došlo ke sloučení obsahu tohoto souboru z obou větví.footnote:[V případě sjednocování binárních souborů většinou není doporučeno použití sjednocení dvou verzí, ale použití celého souboru z jedné nebo druhé větve.] Vzhledem k tomu, že v obou větvích došlo k úpravě jiné části (řádků) souboru, nedošlo ke konfliktu.
+<3> Začlenění bylo provedeno pomocí rekurzivní strategie.
+====
+
+[[img_recursive_after]]
+.Historie po začlenění [autor]
+image::recursive-after.svg[Historie po začlenění [autor\]",scaledwidth=78%]
+
+=== Grafické zobrazení historie
+
+Historie projektu v Gitu tvoří graf, proto je běžné zobrazovat tento graf pro lepší orientaci v historii projektu. Pro zobrazení grafu aktuální větve lze využít příkaz:
+
+[[pr_graph]]
+.Zobrazení historie projektu pomocí grafu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git log --oneline --decorate --graph ;; <1>
+*   c0593d7 (HEAD -> develop) Merge branch 'feature/snake-grow' into develop
+|\
+| * e524045 Přidání grow(size) metody hada
+* | 38f1466 Play/Pause hry klávesou mezerník nebo ESC
+* | d9b576f Implementace animací objektů
+|/
+* b588ff6 Přidání základních objektů hada
+* dde6568 Přidání základního HTML kódu v play.htm
+* 33012c8 (master) Přidání HTML5 hlavičky
+* ccf57ac Vytvoření základních souborů hry
+* d3173a9 (tag: v0.1.0) Přidání README projektu
+*$* gitk ;; <2>
+----
+<1> Přepínač __--graph__ vytvoří textový graf. Pro zobrazení historie všech referencí lze použít přepínač __--all__.
+<2> Pro lepší zobrazení grafického vyjádření lze použít například příkaz `gitk`.
+====
+
+=== Vzdálený repozitář (remote)
+
+Dosud jsme pracovali v našem osobním repozitáři jako uživatel __Daniel Maixner__ (*Dan*). Nyní je čas sdílet projekt _GitSnake_ s dalšími vývojáři, proto vytvoříme {lu}**hlavní**{pu} repozitář, který bude sloužit k synchronizaci mezi vývojáři projektu _GitSnake_. Hlavní repozitář můžeme vytvořit v libovolném sdíleném umístění. Git pro přístup ke vzdáleným repozitářům podporuje protokoly SSH, HTTP(S), FILE a GIT. Pro naše potřeby vytvoříme hlavní repozitář na lokálním disku ve složce _{hlavni-name}_ uložené na ploše našeho operačního systému. V této složce můžeme nastavit čtecí a zapisovací práva pro všechny uživatele operačního systému. Hlavní repozitář nejčastěji nemá pracovní adresář projektu, protože v tomto repozitáři nikdo přímo nepracuje (všichni vývojáři mají vlastní repozitáře). Repozitář bez pracovního adresáře projektu se označuje *bare* a je zvykem pojmenovat složku s __bare__ repozitářem ve tvaru _<název projektu>.git_. Pro vytvoření _bare_ repozitáře použijeme například příkaz `git init --bare <cesta k repozitáři>`:
+
+.Vytvoření hlavního repozitáře
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana ;; <1>
+{snake}
+*$* git init --bare {hlavni}
+Initialized empty Git repository in {hlavni}
+*$* git remote add hlavni {hlavni} ;; <2>
+----
+<1> Pro rozlišení konzole uživatele projektu bude použita poznámka za příkazem `pwd`.
+<2> Přidáme vzdálený repozitář jako referenci _hlavni_ s adresou nově vytvořeného repozitáře.
+====
+
+=== Push
+
+Nově vytvořený hlavní repozitář je nyní {lu}prázdný{pu}. Pro odeslání dat do hlavního repozitáře využijeme příkaz `git push <adresa repozitáře> <data k odeslání>`. Pokud jako <data> použijeme větev, pak Git odešle všechny objekty, které souvisejí se specifikovanou větví. Hlavní repozitář je veřejně dostupný, proto je dobré odeslat pouze větve, které chceme sdílet. V našem případě chceme sdílet větve _master_ a __develop__.
+
+.Odeslání větví do hlavního repozitáře
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git push hlavni master develop ;; <1>
+Counting objects: 39, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (33/33), done.
+Writing objects: 100% (39/39), 4.83 KiB | 0 bytes/s, done.
+Total 39 (delta 14), reused 14 (delta 3)
+To {hlavni}
+ * [new branch]      master -> master
+ * [new branch]      develop -> develop
+----
+<1> Namísto specifikování adresy cílového repozitáře použijeme referenci _hlavni_.
+====
+
+=== Vzdálené větve
+
+Po první komunikaci s hlavním repozitářem se v našem repozitáři vytvořily nové vzdálené větve s názvem _hlavni/master_ a __hlavni/develop__. Vzdálené větve jsou pouze pro čtení, tedy nelze se na ně standartní cestou přepnout. Git tyto větve synchronizuje s větvemi uloženými ve vzdáleném repozitáři _hlavni_. K synchronizaci těchto větví dochází pouze při komunikaci se vzdáleným repozitářem pomocí již známého příkazu `git push` nebo příkazu `git fetch`, který bude probrán v kapitole <<git_fetch>>.
+
+.Vypsání vzdálených větví
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git branch -r ;; <1>
+  hlavni/develop
+  hlavni/master
+----
+<1> Přepínač _-r_ příkazu `git branch` vypíše pouze vzdálené větve. Pro vypsání lokálních i vzdálených větví lze využít přepínač _-a_.
+====
+
+=== Sledování vzdálených větví
+
+Když máme nastavený a aktualizovaný hlavní repozitář, chtěli bychom propojit naše lokální větve _master_ a __develop__ se vzdálenými větvemi _hlavni/master_ a __hlavni/develop__. Díky tomuto propojení (*sledování*) nebudeme muset psát dlouhé příkazy jako `git push hlavni <větev>` ale pouze `git push` pro odeslání aktuální větve do nastaveného vzdáleného repozitáře. Pro nastavení sledování využijeme například příkaz `git branch -u <vzdálená větev> <lokální větev>`, který upraví lokální konfigurační soubor Gitu (_.git/config_):
+
+.Sledování vzdálených větví
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git branch -u hlavni/master master
+Branch master set up to track remote branch master from hlavni.
+*$* git branch -u hlavni/develop develop
+Branch develop set up to track remote branch develop from hlavni.
+----
+====
+
+Pro zobrazení detailních informací o vzdálených repozitářích Git nabízí příkaz `git remote show <repozitář>`.
+
+=== Zkratky referencí v Gitu
+
+V Gitu je mnoho referencí (viz kapitola <<k_reference>>). Již víme, že příkaz `git log master` vypíše historii lokální větve _master_. Ve skutečnosti ovšem dojde k výpisu historie větve _refs/heads/master_. Git prohledává následující složky v tomto pořadí pro nalezení reference s daným názvem:
+
+. .git/<název reference>
+. .git/refs/<název reference>
+. .git/refs/tags/<název reference>
+. .git/refs/heads/<název reference>
+. .git/refs/remotes/<název reference>
+. .git/refs/remotes/<název reference>/HEAD
+
+Pokud bychom tedy měli v repozitáři štítek s názvem _master_ a zároveň lokální větev _master_, Git by vypsal varování a my bychom museli použít specifičtější cestu pro rozlišení, se kterou referencí chceme pracovat.
+
+.Výpis štítků, hlav a vzdálených referencí
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git show-ref ;; <1>
+c0593d7407187d3a0eaa39164d4887ffb99a2a19 refs/heads/develop
+33012c824e321a467c298891013f280ce502db02 refs/heads/master
+c0593d7407187d3a0eaa39164d4887ffb99a2a19 refs/remotes/hlavni/develop
+33012c824e321a467c298891013f280ce502db02 refs/remotes/hlavni/master
+bdc6059afa3b50994df52b7ed94faea24519948b refs/tags/v0.1.0
+----
+<1> Výpis aktuálních štítků, hlav a vzdálených referencí spolu s otisky, na které odkazují.
+====
+
+Aktuálně máme lokální větev _master_ (_refs/heads/master_) a vzdálenou větev _{lu}master{pu}_ (_refs/remotes/hlavni/master_). Vzdálená větev _{lu}master{pu}_ je ale uložena ve složce _refs/remotes/hlavni/_ a Git prohledává vzdálené větve ve složce _refs/remotes/<název reference>_, proto musíme pro specifikování vzdálené větve použít _hlavni/master_, aby Git nalezl správnou cestu _refs/remotes/hlavni/master_. Pro zobrazení celých názvů referencí ve výpisu historie lze použít přepínač __--decorate=full__ příkazu `git log`.

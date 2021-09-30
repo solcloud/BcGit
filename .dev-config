@@ -1,0 +1,3 @@
+PREFIX=uhk_
+PROJECT_NAME=bcgit
+EXTRA_RUN_CMD_1="apt-get install -y asciidoctor"

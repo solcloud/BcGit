@@ -1,0 +1,25 @@
+=== Vytvoření prvního souboru
+
+Dáme na radu Gitu a začneme tvořit projekt (soubory projektu). Jako první, co by měl mít každý projekt, je soubor, který popisuje, čím se projekt zabývá a jak funguje. Pro naše účely to bude jednoduchý soubor _README.txt_, který vytvoříme následovně:
+
+Otevřeme oblíbený textový editor a vytvoříme nový soubor, který uložíme jako _README.txt_ do složky projektu ({snake}). Obsah souboru lze napsat vlastní nebo použít stejný (bez diakritiky) jako v příkladu <<ex_vytvoreni_readme>>. Po uložení souboru se vraťme zpátky do konzole a proveďme kontrolu, zdali zde přibyl námi vytvořený soubor pomocí příkazu `ls`. Pro zobrazení obsahu souboru použijeme příkaz `cat`, který vypíše text zadaný v textovém editoru (lze využít pro opsání textu).
+
+[[ex_vytvoreni_readme]]
+.Vytvoření README souboru
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+# Otevřeme oblíbený textový editor
+# napíšeme/opíšeme obsah souboru
+# uložíme do složky projektu jako README.txt
+*$* pwd
+{snake}
+*$* ls
+README.txt
+*$* cat README.txt
+GitSnake
+
+Vlastni implementace zname hry Snake.
+Projekt slouzi jako ukazka prace v systemu Git.
+----
+====

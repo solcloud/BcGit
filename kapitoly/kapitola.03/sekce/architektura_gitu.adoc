@@ -1,0 +1,12 @@
+=== Architektura
+
+Git byl prvotně napsán jako sada konzolových skriptů. Z počátku se nepředpokládalo vyvinutí do kompletního systému, spíše se předpokládalo, dle definice unixových programů, že bude v budoucnu vyvinut program postavený nad jádrem Gitu pro interakci s uživatelem. Nakonec se však vývojáři rozhodli k příkazům v jádru (v Gitu označované *plumbing*) přidat příkazy uživatelského rozhraní (v Gitu označované *porcelain*), a vytvořit tak kompletní systém. Jádro Gitu je však stále přístupné, a je tak možné pracovat s repozitářem i na nižší úrovni přístupu.
+
+Git ukládá obsahy všech souborů v okamžik commitu jako jednu velkou verzi. Commity v Gitu se proto často označují jako *snímky* (Git při commitu {lu}vyfotí{pu} a uloží kompletní stav projektu v daném čase do historie projektu). Toto chování je velice odlišné od tradičních verzovacích systému, které se zaměřují na změny v jednotlivých souborech.
+
+Všechny commity v Gitu jsou závislé na commitech předešlých, a vytváří se tak vztah **rodič-dítě**footnote:[Lze se setkat i s pojmem předek-potomek.] (parent-child) mezi commity. Git řadí commity do posloupnosti nazývané **větev (branch)**. Projekt může mít i více než jednu větev a podobně také commit může mít i více rodičů nebo žádného. V případě, že commit nemá rodiče, je označován jako **kořen (root-commit)**.
+
+.Lineární vývoj větve projektu v čase [autor]
+image::vyvoj_vetve.svg[Lineární vývoj větve projektu v čase [autor\]",scaledwidth=100%]
+
+Pro vytváření vztahu __rodič-dítě__ je nutné, aby si Git ukládal odkaz na **{lu}poslední{pu} commit**, který se v Gitu označuje **__HEAD__**. Rodič následujícího commitu tak bude commit, na který _HEAD_ odkazuje. Po vytvoření nového commitu se _HEAD_ aktualizuje, aby odkazoval na nově vytvořený commit, a proces se opakuje.

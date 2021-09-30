@@ -1,0 +1,29 @@
+=== Git status
+
+Pro zobrazení stavu projektu z pohledu Gitu Git nabízí příkaz `git status`. Pokud zadáme tento příkaz, tak pokud je pracovní adresář projektu {lu}prázdný{pu} (ve smyslu, že kromě skryté složky _.git_ v něm nic jiného není) Git vypíše následující:
+
+[[pr_git_status_empty]]
+.Git status v {lu}prázdném{pu} pracovním adresáři projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git status
+On branch master ;; <1>
+
+Initial commit ;; <2>
+
+nothing to commit (create/copy files and use "git add" to track) ;; <3>
+----
+<1> __On branch master__ znamená, že Git je nyní fixován na výchozí větev, která se v Gitu jmenuje *master*. Tuto větev budeme {lu}rozrůstat{pu} (přidávat commity).
+<2> __Initial commit__ znamená, že Git čeká na vytvoření prvního commitu projektu ve větvi _master_. Tento commit bude _kořen_ (prvotní rodič všech následujících commitů v __master__ větvi).
+<3> Tento řádek říká, že nemáme nic, co by Git mohl uložit (__commit__nout), což je logické, neboť v pracovním adresáři projektu není žádný soubor. Git nám dává radu, co bychom měli udělat {pomlcka} v tomto případě nám radí, ať vytvoříme, nebo vložíme nějaký soubor do složky projektu a použijeme příkaz `git add`, aby mohl Git začít sledovat změny v tomto souboru.
+====
+
+Přesněji příkaz `git status` slouží k vypsání změn mezi pracovním adresářem projektu, indexem a __HEAD__.
+Git zjistil, že v pracovním adresáři projektu nejsou žádné soubory. V indexu Git také nenalezl žádné soubory a ani v __HEAD__ Git nenalezl žádné soubory, neboť zde žádný commit dosud nebyl vytvořen. Vše ukazuje obrázek <<img_gs_empty_repo>>. Obdobné obrázky budou použity i v dalších sekcích pro lepší pochopení toho, jak Git porovnává změny v těchto kategoriích.
+
+[[img_gs_empty_repo]]
+.Kategorie souborů (git status) [autor]
+image::gs_empty_repo.svg["Kategorie souborů (git status) [autor\]",scaledwidth="80%"]

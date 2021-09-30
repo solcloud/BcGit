@@ -1,0 +1,30 @@
+= Systémy pro správu verzí se zaměřením na Git
+Daniel Maixner
+:experimental:
+:toc:
+:numbered:
+:toclevels: 3
+:author: Daniel Maixner
+:doctype: book
+:encoding: utf-8
+:lang: cs
+:keywords: verzovací systém, VCS, SCM, RCS, Git
+:imagesdir: images
+
+include::konstanty.adoc[]
+
+include::kapitoly/kapitola.01/index.adoc[]
+
+include::kapitoly/kapitola.02/index.adoc[]
+
+include::kapitoly/kapitola.03/index.adoc[]
+
+include::kapitoly/kapitola.04/index.adoc[]
+
+include::kapitoly/kapitola.05/index.adoc[]
+
+include::kapitoly/kapitola.06/index.adoc[]
+
+include::zaver.adoc[]
+
+include::bibliografie.adoc[]

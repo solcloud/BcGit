@@ -1,0 +1,10 @@
+=== Historie
+
+Historie Gitu je úzce spojena s vývojem jádra Linux. V roce 2002 přechází vývoj Linuxu na komerční verzovací systém s názvem BitKeeper. BitKeeper má pro komunitu vývojářů Linuxu výjimku {pomlcka} za jeho používání komunita nemusí nic platit. Tato spolupráce trvá až do roku 2005, kdy je Linuxovému repozitáři tato výjimka odebrána.footnote:[https://lkml.org/lkml/2005/4/6/121] Na tuto událost zareagoval Linus Torvalds, který se začalfootnote:[Hledání nového verzovacího systému pro Linux započalo již před touto událostí, především kvůli faktu, který trápil mnoho vývojářů Linuxu, a sice používání komerčního softwaru pro vývoj nekomerčního softwaru.] rozhlížel po alternativním verzovacím systému. Výsledky hledání náhrady však byly neúspěšné, a tak Linus přišel s vlastním verzovacím systémem, který pojmenoval Git. Git {lu}spatřil světlo světa{pu} 7. dubna 2005, když prokázal svoji vyspělost tím, že jeho zdrojový kód začal verzovat sám Git. [9] Krátce poté přešel vývoj Linuxu pod správu Gitu. [12]
+
+[quote,'volně přeloženo z [13]']
+____
+Git je druhé nejslavnější {lu}dítě{pu} Linuse Torvalda, který Gitu svěřil verzovat miliony řádků zdrojových kódů jádra Linux.
+____
+
+Linus zvolil jméno Git, protože chtěl třípísmennou zkratku, která se dobře vyslovuje (/ɡɪt/) a není použita pro žádný standartní unixový program. [9][14] Nakonec zvolit slovo Git, které pochází z anglického slangu a znamená hloupý (u Gitu je to však myšleno ve smyslu krásně jednoduchý). [9][14]

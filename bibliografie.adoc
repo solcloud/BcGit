@@ -1,0 +1,40 @@
+== Seznam použitých zdrojů
+
+[1] Git [online]. In: Git-scm. [cit. 2015-08-03]. Dostupné z: https://git-scm.com/docs/
+
+[2] The Open Group Base Specifications Issue 7 IEEE Std 1003.1™, 2013 Edition. In: The Open Group Publications Server 
+[online]. [cit. 2015-08-03]. Dostupné z:http://pubs.opengroup.org/onlinepubs/9699919799/
+
+[3] SINK, Eric. Version control by example. 1st ed. Champaign, Ill.: Pyrenean Gold Press, 2011, ix, 277 p. ISBN 9780983507901.
+
+[4] Understanding Version-Control Systems (DRAFT). In: Eric S. Raymond’s Home Page [online]. [cit. 2015-08-03]. Dostupné z:http://www.catb.org/esr/writings/version-control/version-control.html
+
+[5] ROCHKIND, Marc J. The source code control system. IEEE Transactions on Software Engineering [online]. 1975, SE-1(4): 364-370 [cit. 2015-08-03]. DOI: 10.1109/tse.1975.6312866
+
+[6] TICHY, Walter F. Rcs - a system for version control. Software: Practice and Experience [online]. 1985, 15(7): 637-654 [cit. 2015-08-03]. DOI: 10.1002/spe.4380150703.
+
+[7] Concurrent Versions System CVS. In: Dick Grune [online]. [cit. 2015-08-03]. Dostupné z: http://www.dickgrune.com/Programs/CVS.orig/
+
+[8] Apache™ Subversion®. In: Subversion [online]. [cit. 2015-08-03]. Dostupné z:https://subversion.apache.org/
+
+[9] Initial revision of "git", the information manager from hell. In: Kernel.org git repositories [online]. [cit. 2015-08-03]. Dostupné z:http://git.kernel.org/cgit/git/git.git/commit/?id=e83c5163316f89bfbde7d9ab23ca2e25604af290
+
+[10] Matt Mackall. In: Mercurial [online]. [cit. 2015-08-03]. Dostupné z:https://www.mercurial-scm.org/wiki/mpm
+
+[11] Git [online]. In: Git-scm. [cit. 2015-08-03]. Dostupné z: https://git-scm.com/
+
+[12] Linux-2.6.12-rc2. In: Kernel.org git repositories [online]. [cit. 2015-08-03]. Dostupné z: http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=1da177e4c3f41524e886b7f1b8a0c1fc7321cac2
+
+[13] SANTACROCE, Ferdinando. Git Essentials. Packt Publishing, 2015. ISBN 978-1785287909.
+
+[14] Meaning of “git” in the English Dictionary. In: Cambridge Dictionaries Online [online]. [cit. 2015-08-03]. Dostupné z:http://dictionary.cambridge.org/dictionary/english/git
+
+[15] CHACON, Scott a Ben STRAUB. Pro Git. 2nd ed. 2014. ISBN 978-1484200773.
+
+[16] US Secure Hash Algorithm 1 (SHA1). In: IETF Tools [online]. [cit. 2015-08-03]. Dostupné z: https://tools.ietf.org/html/rfc3174
+
+[17] LOELIGER, Jon a Matthew MCCULLOUGH. Version control with Git. 2nd ed. 2012. ISBN 978-1449316389.
+
+[18] CHACON, Scott. Git Internals [online]. 2008 [cit. 2015-08-03]. Dostupné z: https://github.com/pluralsight/git-internals-pdf/raw/master/drafts/peepcode-git.pdf
+
+[19] How to Write a Git Commit Message. Chris Beams [online]. [cit. 2015-08-03]. Dostupné z: http://chris.beams.io/posts/git-commit/

@@ -1,0 +1,55 @@
+[[instalace]]
+=== Instalace
+
+Git je dostupný zdarma pro všechny současné majoritní operační systémy (Windows NT, OS X a Linux) a jeho instalace je jednoduchá. [11] Pro nainstalování Gitu stačí přejít na domovskou stránku Gitu http:/&#xFEFF;/&#xFEFF;git-scm.com/, která by automaticky měla rozpoznat operační systém návštěvníka a nabídnout možnost stažení (*download*) programu. Domovská stránka Gitu poskytuje podrobný návod jak Git stáhnout a následně nainstalovat.
+
+Tato práce předpokládá práci v konzoli schopné emulovat unixové prostředí. OS X a Linux mají konzoli splňující tento požadavek přímo v základní instalaci operačního systému. Pro Windows NT je nutné používat program **Git Bash**, který se nainstaloval spolu s Gitem, případně lze využít jiný emulátor unixového prostředí pro Windows NT, například Cygwinfootnote:[https://www.cygwin.com/] apod.
+
+Po nainstalování Gitu otevřeme konzoli a zadejme příkaz:
+
+[[pr_check_install]]
+.Ověření správného nainstalování Gitu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* git --version
+git version {git-version}
+----
+====
+
+Pokud jsme neinstalovali Git kompilací zdrojových kódů, mělo by se nám vypsat něco podobného výstupu příkladu <<pr_check_install>> (verze Gitu může být odlišná). Pokud se tak stalo, znamená to, že Git je správně nainstalovaný a připraven k použití, v opačném případě je třeba konzultovat návod Gitu.
+
+Po nainstalování Gitu je třeba vyplnit naše jméno a e-mail. Tyto údaje Git použije pro vyplnění autora změny v commitu. Pro nastavení použijeme příkaz:
+
+[[pr_nastaveni]]
+.Nastavení uživatelského jména a e-mailu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* git config --global user.name "Daniel Maixner"
+*$* git config --global user.email "daniel-maixner@seznam.cz"
+----
+====
+
+`Git config <klíč> <hodnota>` slouží pro úpravu nastavení Gitu ve třech úrovních:
+
+* Systémové {pomlcka} nastavení pro všechny repozitáře uložené na daném počítači.
+* Globální {pomlcka} nastavení pro všechny repozitáře, se kterými daný uživatel operačního systému pracuje.
+* Lokální {pomlcka} nastavení pro aktuální repozitář (repozitář, ve kterém je příkaz proveden).
+
+V příkladu <<pr_nastaveni>> jsme použili globální nastavení (přepínač __--global__), které uložilo zadané uživatelské jméno a e-mail jako výchozího autora změn pro všechny commity vytvořené pomocí aktuálně přihlášeného uživatelského účtu operačního systému.
+
+Pokud si nebudeme vědět rady jak použít libovolný příkaz Gitu, případně k čemu slouží, vždy je možnost využít nápovědy Gitu. Nápověda Gitu je dostupná na domovské stránce Gitu nebo přímo v konzoli pomocí příkazu `git help <název příkazu>` nebo pomocí přepínače __--help__ pro daný příkaz.footnote:[Pro zobrazení stručného návodu jak lze použít určitý příkaz, Git nabízí příkaz `git <příkaz> -h`.]
+
+.Zobrazení nápovědy Gitu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+# zobrazení nápovědy pro příkaz Gitu s názvem config
+*$* git help config
+# případně
+*$* git config --help
+----
+====
+
+Příklady v této práci jsou realizovány pomocí Gitu ve verzi {git-version}, vydané {git-version-relase}. Příkazy v této práci patří mezi základní a jejich syntaxe se nezměnila již od verze {git-version-min} a pravděpodobně se v blízké době ani nezmění.

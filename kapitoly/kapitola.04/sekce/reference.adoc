@@ -1,0 +1,190 @@
+[[k_reference]]
+=== Reference
+
+Odkazovat na objekty v Gitu pouze pomocí otisku objektu je pro uživatele nepraktické, a proto Git nabízí možnost použití referencí. Reference jsou v Gitu **pojmenované odkazy na objekty**. Reference se v Gitu dělí na dvě hlavní kategorie:
+
+. Absolutní reference {pomlcka} reference na objekt.
+* Hlavy (složka _.git/refs/heads/_) {pomlcka} lokální větve.
+* Štítky (složka _.git/refs/tags/_) {pomlcka} odkazy na objekty, nejčastěji typu commit.
+* Vzdálené (složka _.git/refs/remotes/_) {pomlcka} vzdálené větve.
+. Symbolické reference {pomlcka} reference na jinou referenci.
+
+Dosud jsme se v této práci setkali se dvěma referencemi {pomlcka} _HEAD_ a __master__.
+
+==== Master
+
+Pro udržování záznamu o historii projektu musí Git udržovat sekvenci posloupnosti commitů, která vytváří historii. Protože projekt může mít více nezávislých linií historie, Git používá koncept větví. Výchozí větev, kterou Git automaticky vytvoří při prvním commitu, se jmenuje _master_. Větev _master_ je většinou považováno za hlavní linií projektu, ale není to pravidlo.
+
+==== Větve
+
+[quote,'volně přeloženo z [18]']
+____
+Vytvoření větve není nic víc než uložení 40 znaků do souboru.
+____
+
+Již jsme viděli, že v commitu samotném není uložen údaj, do jaké větve commit patří. V commitu je však uložen údaj o rodiči, kde již bylo řečeno, že commit může mít i více rodičů. Commity v Gitu vytváří **orientovaný acyklický graf**footnote:[https://en.wikipedia.org/wiki/Directed_acyclic_graph]. Díky vztahu rodič-dítě mezi commity stačí, aby větev v Gitu odkazovala na určitý commit a od tohoto commitu se již daná historie větve dopočítá pomocí všech generací rodičů tohoto commitu. Historie větve tvoří všechny commity, na které se dá pomocí __následování šipek__ (orientovaný graf) dostat z commitu, na nějž větev odkazuje, aniž bychom se dostali zpátky do stejného commitu (acyklický graf). V projektu _GitSnake_ máme zatím pouze lineární historii projektu se třemi commity (viz obrázek <<img_master_history>>). Pro zobrazení otisku, na který odkazuje větev _master_, použijeme příkaz `cat` a pro vypsání všech commitů ve větvi _master_ použijeme například příkaz `git log --oneline master`:
+
+.Vypsání historie větve master
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* cat .git/refs/heads/master ;; <1>
+33012c824e321a467c298891013f280ce502db02
+*$* git log --oneline master ;; <2>
+33012c8 Přidání HTML5 hlavičky
+ccf57ac Vytvoření základních souborů hry
+d3173a9 Přidání README projektu
+----
+<1> Lokální větve jsou ukládány ve složce _.git/refs/heads/<název větve>_. Po vypsání obsahu souboru _master_ dostáváme absolutní odkaz na commit {lu}33012c82{pu}. 
+<2> Výpis historie větve _master_ od commitu, na který _master_ odkazuje, až po _root-commit_.
+====
+
+[[img_master_history]]
+.Historie větve master [autor]
+image::masterBranch.svg[Historie větve master [autor\]",scaledwidth=45%]
+
+Jelikož projekt _GitSnake_ je stále ve vývoji a větev _master_ má podle konvencí obsahovat hlavní ({lu}stabilní{pu}) větev projektu, vytvoříme větev novou, kterou pojmenujeme _develop_. Vytvoření větve provedeme pomocí příkazu `git branch <název nové větve> <commit, na který nová větev bude odkazovat>`. Samotný příkaz `git branch` vypíše seznam lokálních větví projektu.
+
+.Vytvoření a vypsání větví projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git branch develop master ;; <1>
+*$* git branch
+  develop
+* master ;; <2>
+----
+<1> Nová větev _develop_ bude odkazovat na commit, na který nyní odkazuje odkaz _master_.
+<2> Hvězdička ve výstupu příkazu ukazuje, jaká je *aktuální* větev projektu.
+====
+
+Historie větví _master_ a __develop__ jsou stejné, neboť obě větve odkazují na stejný commit (viz obrázek <<img_develop>>).
+
+[[img_develop]]
+.Historie větví master a develop [autor]
+image::developBranch.svg[Historie větví master a develop [autor\]",scaledwidth=45%]
+
+==== HEAD
+
+Již víme, že _HEAD_ nejčastěji odkazuje na {lu}poslední{pu} commit v aktuální větvi a také že _HEAD_ je vždy rodič následujícího commitu. Pokud si zobrazíme obsah reference _HEAD_ ukládané v souboru _.git/HEAD_, dostaneme následující:
+
+[[pr_rp_HEAD]]
+.Zobrazení HEAD
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* cat .git/HEAD
+ref: refs/heads/master ;; <1>
+----
+<1> Výstupem je symbolický zápis používaný v Gitu. _HEAD_ je v tomto případě symbolický odkaz na lokální větev _master_ (viz obrázek <<img_headMaster>>).
+====
+
+[[img_headMaster]]
+.Reference HEAD [autor]
+image::headMaster.svg[Reference HEAD [autor\]",scaledwidth=45%]
+
+Příkaz `git commit` automaticky nastavuje referenci _HEAD_, aby odkazovala na nově vytvořený commit. Proto stačí, když změníme referenci _HEAD_, aby odkazovala na nově vytvořenou větev _develop_, a následující commity budou součástí historie pouze větve _develop_. Pro změnu aktuální větve můžeme přímo upravit obsah souboru _.git/HEAD_, ale ve složce _.git_ je lepší pouze číst nežli zapisovat, proto použijeme příkaz `git checkout <název větve>`, který slouží k nastavení větve v parametru jako aktuální. Historii reference _HEAD_ lze zobrazit pomocí příkazu `git reflog`.
+
+.Změna aktuální větve
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git checkout develop
+Switched to branch 'develop'
+*$* git branch
+* develop
+  master
+*$* cat .git/HEAD
+ref: refs/heads/develop
+----
+====
+
+Pro přidání commitu ve větvi _develop_ otevřeme v textovém editoru soubor _play.htm_ uložený v pracovním adresáři projektu a upravíme obsah, aby vypadal následovně (*tučným* písmem je označen nový obsah):
+
+.play.htm
+[subs=+quotes]
+....
+<!DOCTYPE html>**<html>
+<head><meta charset="UTF-8"><title>GitSnake</title>
+<style>#canvas { border: 2px solid black; }</style>
+</head>
+<body>
+    <canvas width="600" height="300" id="canvas">Váš prohlížeč není podporován</canvas>
+</body>
+</html>**
+....
+
+Po úpravě uložíme a vrátíme se do konzole, kde provedeme commit a následně pomocí přepínačů příkazu `git log` ověříme, že se historie větví projektu rozdělila.
+
+[[pr_add_canvas]]
+.Přidání základního HTML kódu v play.htm
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git add play.htm
+*$* git commit -m "Přidání základního HTML kódu v play.htm"
+[develop dde6568] Přidání základního HTML kódu v play.htm
+ 1 file changed, 8 insertion(+), 1 deletion(-)
+*$* git log --oneline --decorate HEAD ;; <1>
+dde6568 (HEAD -> develop) Přidání základního HTML kódu v play.htm
+33012c8 (master) Přidání HTML5 hlavičky
+ccf57ac Vytvoření základních souborů hry
+d3173a9 Přidání README projektu
+----
+<1> Přepínač __--decorate__ vypisuje názvy referencí, které odkazují na dané commity.
+====
+
+[[img_headDevelop]]
+.Rozdělení historie větví projektu [autor]
+image::headDevelop.svg[Rozdělení historie větví projektu [autor\]",scaledwidth=60%]
+
+Pro práci s odkazy Git poskytuje příkaz `git rev-parse`, který mimo jiné dokáže z předaného parametru vrátit absolutní referenci. Tento příkaz Git vnitřně spouští na všech parametrech, kde očekává otisk. Díky tomu lze používat reference místo otisku. Většina příkazů Gitu očekávající v parametru otisk commitu dosadí _HEAD_, pokud tento parametr nevyplníme.
+
+[[k_annoted_tag]]
+=== Štítek
+
+Štítek v Gitu slouží pro označení objektu. Nejčastěji se označuje (*taguje*) objekt typu commit. Štítky slouží pro přiřazení názvu pro {lu}významný{pu} commit, například nová verze projektu apod. Štítky v Gitu jsou dvojího typu:
+
+. Odlehčený štítek {pomlcka} absolutní reference ukládaná ve složce _.git/refs/tags/_.
+. Komentovaný štítek {pomlcka} objekt typu tag ukládaný v objektové databázi.
+
+Odlehčené štítky se vzhledem k jejich možnosti změny moc nepoužívají, naproti tomu komentované štítky se hojně využívají pro tagování specifické verze historie. Populární systém tagování projektu je __sémantické verzování__footnote:[http://semver.org/], ovšem toto schéma je pouze doporučení a je vždy na vývojářích projektu, na jakých konvencích se domluví. Pro otagování prvního commitu projektu _GitSnake_ pomocí komentovaného štítku použijeme příkaz `git tag -a -m <komentář> <identifikace> <commit>`:
+
+[[pr_add_tag_fcommit]]
+.Přidání štítku pro první commit projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git rev-parse HEAD~3  ;; <1>
+d3173a992e609a9b03f73239e15610987f11935e
+*$* git tag -a -m "První commit GitSnake" v0.1.0 HEAD~3 ;; <2>
+*$* git log --oneline --decorate
+dde6568 (HEAD -> develop) Přidání základního HTML kódu v play.htm
+33012c8 (master) Přidání HTML5 hlavičky
+ccf57ac Vytvoření základních souborů hry
+d3173a9 (tag: v0.1.0) Přidání README projektu ;; <3>
+*$* git cat-file -t v0.1.0 ;; <4>
+tag
+*$* git tag ;; <5>
+v0.1.0
+----
+<1> Pro získání otisku prvního commitu jsme použili _HEAD~3_. Tento zápis znamená, že chceme třikrát prvního předka commitu, na který _HEAD_ odkazuje.footnote:[https://git-scm.com/docs/gitrevisions] Vzhledem k tomu, že zatím máme lineární historii projektu (všechny commity mají maximálně jednoho rodiče), je to třetí commit před _HEAD_.
+<2> Pro vytvoření komentovaného štítku pro commit _HEAD~3_ jsme předali příkazu `git tag` přepínač _-a_ pro specifikování komentovaného štítku a přepínač _-m_ pro komentář štítku.
+<3> Komentované štítky se také objevují ve výstupu příkazu `git log`, pokud použijeme přepínač _--decorate_.
+<4> Typ objektu, na který odkazuje {lu}reference{pu} _v0.1.0_, je typu _tag_. Pro vypsání formátovaného obsahu štítku lze použít příkaz `git cat-file -p v0.1.0`.
+<5> Samotný příkaz `git tag` slouží pro vypsání všech štítků projektu.
+====
+
+Štítky slouží pro označení milníku projektu. V příkladu <<pr_add_tag_fcommit>> jsme použili označení _v0.1.0_ pro první commit projektu _GitSnake_, díky tomuto štítku můžeme kdykoli v budoucnu odkazovat na commit {lu}d3173a99{pu} jako na _verzi 0.1.0_ namísto hledání a použití otisku prvního commitu. Komentované štítky a commity se dají digitálně podepsat pomocí GnuPGfootnote:[https://www.gnupg.org/]. [15]

@@ -1,0 +1,537 @@
+=== Implementace funkcí praktického projektu
+
+Pro ukázku dalších funkcí Gitu vytvoříme pár commitů v roli Dana. Začneme vytvořením větve __feature/&#xFEFF;collidable-&#xFEFF;entity__ a následně větve _feature/game-food_.
+
+.Vytvoření větve pro implementaci kolizí objektů
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git checkout --quiet -b feature/collidable-entity
+----
+====
+
+Upravíme následující soubory projektu:
+
+.js/SquareObject.js
+[subs=+quotes]
+....
+    } turn(velX, velY) {
+        this.velocity.x = velX; this.velocity.y = velY;
+    }** hasSamePositionAs(point) {
+        return (this.collidable && this.position.equals(point));
+    } resolveCollisionWithSnake(snake, game) {
+        game.gameOver();
+    }**
+}
+....
+
+.js/Snake.js
+[subs=+quotes]
+....
+        lastChunk.position.setTo(this.position); super.animate();
+    }** resolveCollisionWithSnake(snake, game) {
+        this.tail.forEach(function (chunk) {
+            if (chunk.hasSamePositionAs(snake.position))
+                game.gameOver();
+        });
+    } hasSamePositionAs(point) {
+        return this.tail.some(function (chunk) {
+            return chunk.hasSamePositionAs(point);
+        });  // not snake head itself
+    }**
+}
+....
+
+.js/Game.js
+[subs=+quotes]
+....
+    } animate() {
+        this.gameObjects.forEach(function (entity) {
+            **if (entity.hasSamePositionAs(this.snake.position)) {
+                entity.resolveCollisionWithSnake(this.snake, this);
+            }**
+            entity.animate();
+        }, this);
+}
+....
+
+.Přidání metod pro kolizi objektů
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git add js/SquareObject.js js/Snake.js
+*$* git commit --quiet -m "Přidání metod pro kolizi objektů"
+*$* git commit --quiet -a -m "Kolize entit s hlavou hada"
+*$* git checkout --quiet -b feature/game-food HEAD^1 ;; <1>
+*$* touch js/Food.js
+----
+<1> Zápis *<commit>^N* znamená, že chceme _N_-tého rodiče uloženého v daném commitu.
+====
+
+Upravíme následující soubory (symbol **[...]** označuje vynechání části kódu ve výpisu):
+
+.js/Food.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.Food = class Food extends GitSnake.SquareObject {
+    constructor(pos) {
+        super(pos); this.score = 1; this.color = "gray";
+    } resolveCollisionWithSnake(snake, game) {
+        this.position.setTo(game.getRandomFreeCell());
+        snake.grow(this.score); game.increaseScore(this.score);
+    }
+}**
+....
+
+.js/Game.js
+[subs=+quotes]
+....
+        this.addEntity(this.snake);
+        **this.addEntity(new GitSnake.Food(this.getRandomFreeCell()));**
+    } addEntity(entity) {
+[...]
+    } pause() {
+        this.isPlaying = false;
+        clearInterval(this.drawingId); clearInterval(this.animationId);
+    }** getRandomFreeCell() {
+        var cellPoint = new GitSnake.Point2D(
+            Math.floor(Math.random() * this.tileX), Math.floor(Math.random() * this.tileY)
+        );
+        if (this.gameObjects.every(function (entity) {
+            return entity.hasSamePositionAs(cellPoint) === false;
+        })) {
+            return cellPoint;
+        } return this.getRandomFreeCell();
+    } increaseScore(score) {
+        this.score += score;
+    }**
+}
+....
+
+.play.htm
+[subs=+quotes]
+....
+    <script src="js/Game.js"></script>**
+    <script src="js/Food.js"></script>**
+    <script>
+....
+
+
+.Přidání jídla na náhodné pozici
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git add js/Food.js ;; <1>
+*$* git commit --quiet -a -m "Přidání jídla na náhodné pozici"
+*$* git checkout --quiet develop
+*$* git fetch
+*$* git l feature/game-food feature/collidable-entity -4 ;; <2>
+* e764ba8 (feature/game-food) Přidání jídla na náhodné pozici
+| * bce0dc8 (feature/collidable-entity) Kolize entit s hlavou hada
+|/
+* 3103eff Přidání metod pro kolizi objektů
+* 7efeb7e (HEAD -> develop) Přidání .gitignore pro složku images
+*$* git merge --quiet --no-edit feature/collidable-entity feature/game-food ;; <3>
+*$* git branch --quiet -d feature/collidable-entity feature/game-food
+*$* git push --quiet
+----
+<1> Do indexu přidáme nesledovaný soubor _js/Food.js_.
+<2> Použijeme alias z příkladu <<pr_alias>>, který vytvoříme také pro uživatele Dana. Aliasu předáme reference, které chceme zahrnout v logu a také omezíme výstup na poslední 4 commity.
+<3> Příkaz `git merge` zvládá sloučit i více větví. V tomto případě dojde k začlenění pomocí _octopus_ strategie.
+====
+
+=== Implementace hratelnosti
+
+Bob se rozhodl zapracovat na hratelnosti hry, a proto vytvořil novou větev pro ztížení hry:
+
+.Vytvoření větve pro ztížení hry
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git pull --quiet --ff-only
+*$* git checkout --quiet -b feature/game-difficulty
+----
+====
+
+Bob upraví následující soubor:
+
+.js/Game.js
+[subs=+quotes]
+....
+    } increaseScore(score) {
+        this.score += score;**
+        if (this.score % 5 === 0) {
+            this.animationSpeed = Math.max(50, this.animationSpeed - 5);
+            this.pause(); this.play();
+        }**
+    }
+}
+....
+
+Po úpravě a uložení Bob provede commit. Bob si ovšem není jistý, zdali neprovede ještě další změny ve větvi _feature/game-difficulty_, a proto zatím nebude tuto větev začleňovat do větve _develop_ a následně sdílet do hlavního repozitáře.
+
+.Ztížení hry po každých 5 bodech
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git commit --quiet -m "Ztížení hry po každých 5 bodech" js/Game.js
+----
+====
+
+=== Začlenění do větve master
+
+Verze hry _GitSnake_ ve větvi _develop_ v hlavním repozitáři již dost připomíná originální hru Had, proto provedeme začlenění větve develop do větve master a vytvoříme nový štítek. Po vydání verze _v1.0.0_ pokračujeme ve vývoji příjemnějšího uživatelského rozhraní (uifootnote:[https://en.wikipedia.org/wiki/User_interface]) hry.
+
+.Vydání verze 1.0.0
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git checkout --quiet master
+*$* git pull --quiet --rebase
+*$* git merge --quiet develop
+*$* git tag -a -m "Kolize objektů a nárůst hada po jídle" v1.0.0
+*$* git push --quiet --tags
+*$* git push --quiet
+*$* git checkout --quiet -b feature/game-ui
+*$* touch js/Text.js
+----
+====
+
+Upravíme následující soubory:
+
+.js/Text.js
+[subs=+quotes]
+....
+**"use strict";
+GitSnake.Text = class Text extends GitSnake.SquareObject {
+    constructor(pos, text) {
+        super(pos); this.text = text; this.color = "gray"; this.collidable = false;
+        this.attr = {
+            overlay: { color: "white", opacity: 0 },
+            font: "18px Arial", textAlign: "left"
+        };
+    } draw(ctx) {
+        if (this.text === undefined)
+            return;
+
+        ctx.fillStyle = this.attr.overlay.color;
+        ctx.globalAlpha = this.attr.overlay.opacity;
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.globalAlpha = 1; ctx.textAlign = this.attr.textAlign;
+        ctx.fillStyle = this.color; ctx.font = this.attr.font;
+        ctx.fillText(this.text, this.position.x * this.size, this.position.y * this.size);
+    }
+}**
+....
+
+.js/Game.js
+[subs=+quotes]
+....
+        this.addEntity(this.snake);
+        this.addEntity(new GitSnake.Food(this.getRandomFreeCell()));**
+        var pos = new GitSnake.Point2D(1, this.tileY - 1);
+        this.scoreText = new GitSnake.Text(pos, "Skóre: " + this.score);
+        this.scoreText.attr.font = "15px Arial"; this.addEntity(this.scoreText);
+        pos = new GitSnake.Point2D(this.tileX / 2, this.tileY / 2)
+        this.pauseText = new GitSnake.Text(pos);
+        this.pauseText.attr.textAlign = "center"; this.pauseText.attr.overlay.opacity = 0.8;
+    } setPauseText(text) {
+        this.pauseText.text = text; this.pauseText.draw(this.ctx);**
+    } addEntity(entity) {
+[...]
+    } increaseScore(score) {
+        this.score += score;
+        **this.scoreText.text = "Skóre: " + this.score;**
+    }
+}
+....
+
+.play.htm
+[subs=+quotes]
+....
+    <script src="js/Game.js"></script>
+    <script src="js/Food.js"></script>**<script src="js/Text.js"></script>**
+    <script>
+        (function () {
+            var game = new GitSnake.Game(document.getElementById("canvas"), 20, 30);
+            **game.setPauseText("Pro zahájení hry stiskněte mezerník nebo Esc");**
+            var snake = game.snake;
+[...]
+                        if (game.isPlaying) {
+                            game.pause();
+                            **game.setPauseText("Hra pozastavena");**
+                        } else {
+....
+
+.Přidání textů UI
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git add js/Text.js
+*$* git commit --quiet -a -m "Přidání textů UI"
+*$* git checkout --quiet develop
+*$* git merge --quiet --no-ff feature/game-ui ;; <1>
+*$* git branch --quiet -d feature/game-ui
+*$* git push --quiet
+----
+<1> Přepínač __--no-ff__ specifikuje, že nechceme použít metodu _fast-forward_, ale vytvořit nový (_merge_) commit.
+====
+
+[[k_konflikt]]
+=== Konflikt
+
+Konflikt vzniká, pokud sjednocujeme větve, ve kterých došlo ke změně stejného řádku. V takovém případě Git neví, která varianta souboru je ta {lu}správná{pu}, a oznámí tedy konflikt a vyzve uživatele, aby konflikt vyřešil. Pro vyznačení konfliktu Git používá ve výchozím nastavení standartní značky konfliktů:
+
+[subs=+quotes]
+....
+**<<<<<<< HEAD**
+varianta v aktuální větvi (HEAD)
+**=======**
+varianta ve sjednocované větvi
+**>>>>>>> sjednocovaná větev**
+....
+
+Bob se rozhodl, že jeho lokální větev _feature/game-difficulty_ je dokončená, a tedy připravená pro začlenění do větve _develop_ a odeslání do hlavního repozitáře:
+
+.Konflikt
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git checkout --quiet develop
+*$* git pull --quiet --rebase
+*$* git merge feature/game-difficulty
+Auto-merging js/Game.js
+CONFLICT (content): Merge conflict in js/Game.js ;; <1>
+Automatic merge failed; fix conflicts and then commit the result.
+*$* tail -12 js/Game.js ;; <2>
+    } increaseScore(score) {
+        this.score += score;
+<<<<<<< HEAD ;; <3>
+        this.scoreText.text = "Skóre: " + this.score;
+======= ;; <4>
+        if (this.score % 5 === 0) {
+            this.animationSpeed = Math.max(50, this.animationSpeed - 5);
+            this.pause(); this.play();
+        }
+>>>>>>> feature/game-difficulty  ;; <5>
+    }
+}
+----
+<1> Git oznámil konflikt v souboru _js/Game.js_.footnote:[Pro zrušení *probíhajícího* začlenění a vrácení se do stavu před začleněním lze použít přepínač __--abort__ příkazu `git merge`. Přepínač __--abort__ lze použít i pro další příkazy například `git rebase` a další.]
+<2> Pro zobrazení konfliktu můžeme otevřít soubor v textovém editoru nebo použít příkaz `tail <soubor>` s přepínačem __-12__ pro zobrazení posledních 12 řádek souboru v parametru.
+<3> Varianta (níže po oddělovač), kterou vytvořil Dan (_HEAD_).
+<4> Oddělovač variant.
+<5> Varianta (výše po oddělovač), kterou vytvořil Bob (_feature/game-difficulty_).
+====
+
+Pro vyřešení konfliktu otevřeme soubor _js/Game.js_ v textovém editoru a upravíme následovně:footnote:[Pro vyřešení konfliktu lze použít externí program pomocí příkazu `git mergetool`.]
+
+.js/Game.js
+[subs=+quotes]
+....
+    } increaseScore(score) {
+        **this.score += score; this.scoreText.text = "Skóre: " + this.score;
+        if (this.score % 5 === 0) {
+            this.animationSpeed = Math.max(50, this.animationSpeed - 5);
+            this.pause(); this.play(); // refresh loops
+        }**
+    }
+}
+....
+
+V tomto případě jsme vyřešili konflikt sloučením a úpravou změn z obou větví. Nyní musíme ještě říci Gitu, že jsme konflikt vyřešili přidáním souboru do indexu a provedením commitu:
+
+.Vyřešení konfliktu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git status -s
+UU js/Game.js
+*$* git add js/Game.js
+*$* git commit --quiet --no-edit ;; <1>
+*$* git branch --quiet -d feature/game-difficulty
+*$* git push --quiet
+----
+<1> Po vyřešení konfliktu je dobrým zvykem popsat v popisu změny, jak jsme konflikt vyřešili spolu s dalšími informacemi. Zde ovšem pro jednoduchost použijeme již známý přepínač __--no-edit__, který použije popis vygenerovaný Gitem.
+====
+
+=== Cherry-pick
+
+Příkaz `git cherry-pick <commit>` slouží k aplikování změny, kterou přinesl daný commit na aktuální větev. Tento příkaz se tak výborně hodí pokud udržujeme více větví projektu. Například ve větvi _develop_ od posledního sjednocení s větví _master_ přibylo mnoho commitů, které ještě nechceme sjednotit do větve _master_, ale jeden z těchto mnoha commitů opravuje velkou chybu, a tedy bychom změnu v tomto specifickém commitu chtěli aplikovat nad větví _master_.
+
+V projektu _GitSnake_ byla objevena chyba v pohybu hada. Opravením chyby byl pověřen Bob, který chybu diagnostikoval a vymyslel řešení problému:
+
+.Oprava chyby v pohybu hada
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git fetch
+*$* git checkout --quiet -b hotfix/snake-move
+----
+====
+
+.js/SquareObject.js
+[subs=+quotes]
+....
+        this.velocity = new GitSnake.Point2D(0, 0);**
+        this.lastVelocity = this.velocity.copy();**
+    } draw(ctx) {
+[...]
+    } animate() {
+        this.position.x += this.velocity.x; this.position.y += this.velocity.y;**
+        this.lastVelocity.x = this.velocity.x; this.lastVelocity.y = this.velocity.y;**
+    } turn(velX, velY) {
+....
+
+.js/Snake.js
+[subs=+quotes]
+....
+            this.tail.push(new GitSnake.SquareObject(lastChunk.position.copy()));
+        }
+    }** turn(velX, velY) {
+        if (this.lastVelocity.x !== -(velX) || this.lastVelocity.y !== -(velY))
+            super.turn(velX, velY);
+    }** draw(ctx) {
+        this.tail.forEach(function (chunk) {
+....
+
+.Omezení nepovoleného pohybu hada
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git commit -a -m "Omezení nepovoleného pohybu hada"
+[hotfix/snake-move 61fe963] Omezení nepovoleného pohybu hada
+ 2 files changed, 5 insertions(+)
+*$* git checkout --quiet develop
+*$* git merge --quiet --no-ff --no-edit hotfix/snake-move
+*$* git branch --quiet -d hotfix/snake-move
+*$* git push --quiet ;; <1>
+*$* git checkout --quiet master
+*$* git pull --quiet --rebase
+*$* git cherry-pick 61fe963 ;; <2>
+[master 24b8edd] Omezení nepovoleného pohybu hada
+ Date: Fri Apr 22 16:22:37 2016 +0100
+ 2 files changed, 5 insertions(+)
+*$* git tag -a -m "Omezení nepovoleného pohybu hada" v1.1.0
+*$* git push --quiet hlavni v1.1.0
+*$* git push --quiet ;; <3>
+*$* git checkout --quiet develop
+----
+<1> Oprava chyby ve větvi _develop_ byla odeslána do hlavního repozitáře pro stažení ostatními vývojáři.
+<2> Po přepnutí na větev _master_ aplikujeme commit (změnu v commitu) {lu}61fe963{pu} nad větví _master_.
+<3> Odešleme a začleníme změny větve _master_ do hlavního repozitáře.
+====
+
+[[git_rename]]
+=== Přejmenování/přesunutí souborů (mv)
+
+Git na rozdíl od jiných verzovacích systémů neukládá informace o přejmenování souborů. Pokud přejmenujeme soubor s názvem _A_ na _B_, Git toto přejmenování chápe tak, že se smazal soubor s názvem _A_ a obsahem _O_ a zároveň přibyl nový soubor s názvem _B_ a obsahem __O__. Pokud ovšem změníme obsah souboru _A_ a zároveň provedeme přejmenování z __A__ na _B_, situace je trochu komplikovanější a Git musí použít heuristiku pro odhad, zdali se jedná o nový soubor, nebo přejmenování souboru původního. Tato heuristika funguje tak, že pokud je shoda obsahu _X_ % a více (kde _X_ se dá uživatelsky definovat) je tato operace rozpoznána jako přejmenování, v opačném případě se jedná o smazání původního souboru a přidání souboru nového. Nejlepší je proto, pokud měníme obsah souboru a zároveň chceme soubor přejmenovat, vytvořit dva commity, ovšem ne vždy je toto možné (například pokud se obsah souboru váže s názvem daného souboru). Pro ukázku Bob upraví soubor _README.txt_ do Markdownfootnote:[https://daringfireball.net/projects/markdown/] syntaxe následovně:
+
+.README.txt
+[subs=+quotes]
+....
+**#** GitSnake
+
+**-** Vlastn**í** implementace zn**á**m**é** hry Snake.
+**-** Projekt slou**ží** jako uk**á**zka pr**á**ce v syst**é**mu Git.
+....
+
+Po uložení a zavření souboru v editoru se vrátíme do konzole, kde provedeme dva commity.
+
+.Přesunutí/přejmenování souboru
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git commit --quiet -a -m "README převedeno do Markdown syntaxe" ;; <1>
+*$* git mv README.txt README.md ;; <2>
+*$* git commit --quiet -m "README.txt přejmenováno na README.md"
+*$* git push --quiet
+----
+<1> První commit se změnou obsahu.
+<2> Přejmenování souboru _README.txt_ v pracovním adresáři projektu i v indexu na __README.md__ pomocí příkazu `git mv <starý název> <nový název>`. Příkaz `git mv` slouží jak pro přejmenování, tak i pro přesunutí souboru obdobně jako unixová verze `mv`.
+====
+
+Git nikde neukládá informaci o přejmenování, a proto pokud chceme zjistit například historii souboru {lu}__README.md__{pu} ve větvi _HEAD_, musíme použít `git log --follow README.md`. Přepínač __--follow__ instruuje Git, aby aplikoval heuristiku pro detekování přejmenování souboru.
+
+=== Závěrečné začlenění do větve master
+
+Projekt _GitSnake_ již v této práci nebudeme upravovat, a proto provedeme závěrečné začlenění větve _develop_ do větve _master_. Také si zobrazíme porovnání s první verzí projektu.
+
+.Sjednocení větví develop a master
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git checkout --quiet master
+*$* git merge --quiet --no-edit develop
+Removing README.txt
+*$* git push --quiet
+*$* git diff --stat v0.1.0 HEAD
+ .gitignore         |  1 +
+ README.md          |  4 +++
+ README.txt         |  4 ---
+ images/.gitkeep    |  0
+ js/Food.js         |  9 +++++++
+ js/Game.js         | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ js/Point2D.js      | 13 +++++++++
+ js/Snake.js        | 32 +++++++++++++++++++++++
+ js/SquareObject.js | 22 ++++++++++++++++
+ js/Text.js         | 20 ++++++++++++++
+ play.htm           | 35 +++++++++++++++++++++++++
+ 11 files changed, 213 insertions(+), 4 deletions(-)
+----
+====
+
+=== Blame
+
+Příkaz `git blame <reference> <název souboru>` slouží pro vypsání v jakém commitu a kdo v dané referenci *naposledy* změnil každý řádek daného souboru. Například pro zobrazení _blame_ souboru _README.md_ v referenci _HEAD_ použijeme příkaz `git blame README.md`.
+
+=== Garbage collector (gc)
+
+Pokud vyhledáme všechny soubory v objektové databázi podobně jako v příkladu <<pr_go_first_commit>>, zjistíme, že se objektová databáze poměrně rozrostla. Pro ušetření místa obsahuje Git mechanismus, který komprimuje objektovou databázi a také reference. Příkaz `git repack` slouží pro vytvoření tzv. zabalených (_packed_) objektů, které výrazně šetří úložný prostor a zároveň i datový přenos, například při klonování repozitáře po síti. `Git repack` se spouští jako subrutina garbage collectoru (příkaz `git gc`), který slouží pro údržbu repozitáře. Hlavním úkolem garbage collectoru je smazat objekty, které jsou nedosažitelnéfootnote:[Ve výchozím nastavení Git maže pouze nedosažitelné objekty starší než 2 týdny.], a provést zabalení (_pack_) objektů a referencí. Nedosažitelné objekty jsou všechny objekty, na které se nedá dostat z libovolné reference nebo štítku.footnote:[Pro vypsání všech nedosažitelných objektů lze použít příkaz `git fsck --unreachable`.]
+
+.Spuštění garbage collectoru
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* du -sh .git/ ;; <1>
+226K     .git/
+*$* git gc
+Counting objects: 150, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (127/127), done.
+Writing objects: 100% (150/150), done.
+Total 150 (delta 56), reused 55 (delta 20)
+*$* du -sh .git/
+136K     .git/
+----
+<1> Příkaz `du` slouží k zjištění, kolik daný soubor (složka) zabírá místa na disku.
+====

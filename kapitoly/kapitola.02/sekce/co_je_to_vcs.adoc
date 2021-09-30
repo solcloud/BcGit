@@ -1,0 +1,11 @@
+[[k_co_je_vcs]]
+=== Systém pro správu verzí
+
+Systém pro správu verzí (zkratka VCSfootnote:[Z anglického version control system.]) je počítačový program pro ukládání verzí (někdy též označovaných revizí) skupiny souborů. Takováto skupina souborů se nazývá *projekt*. Projekt je udržovaný ve složce označované *pracovní adresář projektu*. Verzovací systém ukládá veškeré uložené verze projektu do struktury nazývané **repozitář**footnote:[Lze se setkat i s výrazem databáze. V této práci je však výhradně použit výraz repozitář.].
+
+Systém pro správu verzí (dále jen *verzovací systém*) pracuje na principu ukládání verzí projektu v čase. Tyto verze ovšem verzovací systém ukládá pouze, pokud je mu implicitně řečeno, na rozdíl od v úvodu zmiňovaného tlačítka __ZPĚT__, které ukládá veškeré změny například po stisku klávesy v okně aplikace. Verzovací systém se nejčastěji používá pro ukládání textových souborů (souborů kódovaných pomocí standardu pro text), ale dnešní moderní verzovací systémy umožňují verzovat i soubory binárnífootnote:[Verzovací systémy však nejsou primárně navrženy k verzování většího počtu binárních souborů, k tomuto účelů existují speciální programy pro zálohování dat.] (aplikace, videa a další netextové soubory).
+
+Verzovací systém u každé uložené verze, které se říká **commit**, zaznamená, **kdo změnu provedl**, *datum* a uživatelem definovaný *popis* této změny.
+
+.Ukázka vývoje projektu v čase [autor]
+image::vyvoj_repozitare_projektu_v_case.svg["Ukázka vývoje projektu v čase [autor\]",scaledwidth="84%"]

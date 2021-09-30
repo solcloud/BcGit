@@ -1,0 +1,19 @@
+=== Vytvoření repozitáře projektu
+
+Minulou sekci jsme zakončili vytvořením pracovního adresáře projektu a změnou pracovního adresáře konzole na toto nové umístění. V této sekci vytvoříme repozitář projektu pomocí příkazu Gitu. Pro vytvoření repozitáře stačí naklonovat existující repozitář nebo vytvořit repozitář nový. V tomto případě budeme vytvářet repozitář nový.
+
+Pro vytvoření repozitáře stačí zadat příkaz `git init`. Takto napsaný příkaz vytvoří repozitář v současném pracovním adresáři konzole.
+
+[[pr_vytvoreni_repa]]
+.Vytvoření repozitáře projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git init ;; <1>
+Initialized empty Git repository in {home-repo}/git_snake/.git/ ;; <2>
+----
+<1> Pomocí příkazu `git init` řekneme Gitu, aby v aktuálním pracovním adresáři konzole (složka __git_snake__ uložená na _Ploše_) vytvořil a zinicializoval nový repozitář. Pokud by zde repozitář již existoval, Git by načetl inicializační sekvenci znovu (existující soubory projektu by zůstaly nedotčené).
+<2> Výsledkem příkazu je potvrzení od Gitu o vytvoření a zinicializování Git repozitáře (vytvoření složky _.git_) v umístění __{snake}/.git/__.
+====

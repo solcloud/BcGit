@@ -1,0 +1,66 @@
+[[k_ulozeni_do_repa]]
+=== Uložení změn do historie projektu
+
+[quote,'volně přeloženo z [17]']
+____
+Commit je jediný způsob jak lze uložit změnu do historie a každá změna v historii musí být uvedena commitem.
+____
+
+Když máme připravené změny pro uložení v indexu, stačí provést příkaz `git commit`. Po provedení příkazu Git uloží data v indexu do historie aktuální větve (_master_).
+
+[[pr_git_commit]]
+.Git commit
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git commit -m "Přidání README projektu" ;; <1>
+[master (root-commit) d3173a9] Přidání README projektu ;; <2>
+ 1 file changed, 4 insertions(+) ;; <3>
+ create mode 100644 README.txt ;; <4>
+----
+<1> Příkazu `git commit` byl předán přepínač _-m_, který slouží k specifikování popisu změny. Jak správně psát popisy změn bude ukázáno v kapitole <<k_jak_spravne_psat_commitmsg>>.
+<2> Tento řádek vypisuje informace o nově vytvořeném commitu. Konkrétně, že commit byl proveden na _master_ větvi a také, že tento commit je kořen *(root-commit)*. Poslední slovo mezi hranatými závorkami je {lu}d3173a9{pu}, což je prvních 7 znaků *commit-id*. _Commit-id_ bude podrobněji vysvětleno v následující kapitole. Pokud následujeme příkazy v této práci, je pravděpodobné, že se nám vypsaly znaky jiné, toto chování je normální a bude vysvětleno v následující kapitole. Za hranatými závorkami je vypsán první řádek popisu změny.
+<3> Souhrn toho, co se v commitu událo, 1 soubor byl změněn (_README.txt_) a byly přidány (+) 4 řádky (počet řádků v souboru _README.txt_).
+<4> Poslední řádek vypisuje informace o nových a smazaných souborech obsažených v commitu. Soubor __README.txt__ nebyl v předchozí _HEAD_, proto byl nově vytvořen (create). Režim 100644 je spojení dvou čísel, čísla 100, což značí klasický (nelinkový) soubor a čísla 644, které označuje podmnožinufootnote:[Git ve starších verzích podporoval plná unixová práva k souboru, ovšem tato vlastnost přinášela více obtíží než užitku, a proto byla práva k souboru zredukována na podmnožinu unixových práv.] unixových přístupových práv k souboru.
+====
+
+Po provedení příkazu `git status` dostaneme následující výpis:
+
+.Git status s čistým pracovním adresářem projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git status
+On branch master
+nothing to commit, working directory clean ;; <1>
+----
+<1> Git vypsal zprávu, že pracovní adresář projektu je čistý. Čistý znamená, že obsah pracovního adresáře projektu je stejnýfootnote:[Za předpokladu, že v pracovním adresáři projektu nejsou ignorované soubory.] jako obsah _HEAD_ a obsah indexu.
+====
+
+.Kategorie souborů (git status) [autor]
+image::gs_commited.svg["Kategorie souborů (git status) [autor\]",scaledwidth=80%]
+
+=== Git log
+
+Pro zobrazení historie větve projektu použijeme příkaz `git log <název větve>`:
+
+.Git log
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git log master
+commit d3173a992e609a9b03f73239e15610987f11935e
+Author: Daniel Maixner <daniel-maixner@seznam.cz>
+Date:   Sat Mar 12 11:53:58 2016 +0100
+
+    Přidání README projektu
+----
+====
+
+Příkazy Gitu mají nastavený výstup do stránkovacího programu, kterým je ve výchozím nastavení `less`. Pokud se tedy nevejde výstup příkazu na jednu obrazovku konzole, dojde ke stránkování.

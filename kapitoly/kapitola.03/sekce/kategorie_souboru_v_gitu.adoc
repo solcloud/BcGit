@@ -1,0 +1,31 @@
+=== Kategorie souborů v Gitu
+
+Git ve výchozím nastavení ukládá repozitář projektu do pracovního adresáře projektu, konkrétně do složky ve výchozím nastavení pojmenované _.git_.footnote:[Pro odkazování na složku repozitáře Gitu v této práci bude použit výraz _.git_.] V pracovním adresáři projektu tak jsou nejčastěji uložena data projektu spolu se složkou _.git_ obsahující data repozitáře tohoto projektu.
+
+<<<
+----
+.
+└── složka_projektu (pracovní adresář projektu)
+    ├── .git (repozitář projektu)
+    ├── soubory
+    ├── a_složky
+    ├── projektu
+----
+
+Soubory projektu z pohledu Gitu se mohou nacházet v jedné ze dvou hlavních kategorií:
+
+. Tracked (sledované) {pomlcka} soubory, které jsou uloženy v __HEAD__ nebo ve staging area. Sledované soubory se mohou nacházet v jednom z následujících stavů:
+.. Modified (změněné)footnote:[Změnou souboru Git rozumí kromě změny v obsahu souboru i vytvoření, smazání či přejmenování souboru.] {pomlcka} znamená, že se daný soubor v pracovním adresáři projektu změnil v porovnání se souborem uloženým v __HEAD__ nebo v porovnání se staging area. Tuto změnu lze uložit do historie větve.
+.. Unmodified (nezměněné) {pomlcka} znamená, že soubor je ve stejné verzi, jaká je uložená v __HEAD__, a zároveň i ve staging area.
+. Untracked (nesledované) {pomlcka} ostatní souboryfootnote:[Soubor může být i ve stavu ignorován (ignored). Tento stav je specializací nesledovaných souborů. Více o ignorovaných souborech v kapitole <<git_ignore>>.], které nejsou uloženy v __HEAD__ nebo ve staging area. Tyto soubory nelze uložit do historie projektu. Git ukládá verze pouze u souborů projektu, u kterých mu je implicitně řečeno, aby je ukládal. Každý nově vytvořený soubor projektu je proto automaticky zařazen do kategorie nesledované soubory.
+
+Pro práci se sledovanými soubory Git obsahuje dvě hlavní struktury udržované ve složce _.git_:
+
+. Staging area (dále jen **index**footnote:[Pokud bude v této práci psáno o staging area, bude použit výraz index především kvůli lepšímu použití v české větě. Správně by se však měl používat výraz staging area, i když použití slova index není špatně. Občas se také lze setkat s výrazem cache, který by se ale neměl v tomto kontextu používat.]) {pomlcka} index slouží jako mezistupeň mezi pracovním adresářem projektu a příštím commitem. Index ukazuje, jaké soubory budou uloženy v příštím commitu (čeká se na příkaz commit pro trvalé uložení).
+. Commited (zapsáno) {pomlcka} soubory, které byly v indexu, jsou bezpečně uloženy v historii projektu (proběhl commit).
+
+Tuto sekci zakončuje obrázek <<img_stavy_souboru>>, který graficky shrnuje změny v souborech projektu z pohledu Gitu. V následujících sekcích bude rozebráno, jak lze měnit kategorie, ve kterých se soubory projektu nachází, pomocí příkazů Gitu.
+
+[[img_stavy_souboru]]
+.Kategorie, které nabývají soubory projektu [autor]
+image::stavy_souboru.svg["Kategorie, které nabývají soubory projektu [autor\]",scaledwidth=91%]

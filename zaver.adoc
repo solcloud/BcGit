@@ -1,0 +1,5 @@
+== Závěr
+
+Cílem této práce bylo poskytnout základní informace o verzovacích systémech, jak fungují, proč a k jakému účelu byly primárně vytvořeny. Po seznámení se s verzovacími systémy následoval popis verzovacího systému Git, kterému se věnovala většina této práce. Práce s Gitem byla psaná pro uživatele, kteří s verzovacími systémy (Gitem) začínají, a byly popsány každodenní případy užití Gitu, se kterými se uživatelé setkají nejčastěji. Výstupem těchto každodenních případů vznikl praktický projekt {pomlcka} hra Had.
+
+Tato práce nerozebírá Git do největších detailů především kvůli omezení počtu stránek práce, ale slouží spíše jako začátečnická příručka. Pro pokročilejší práci s Gitem bylo doporučeno mnoho zdrojů, kde se o problematice Gitu píše podrobněji. Zde si dovolíme opakovat se a znovu doporučíme jako zdroj oficiální nápovědu Gitu, dostupnou například na domovské stránce Gitu, která je hned po zkoumání zdrojového kódu samotného Gitu nejlepším místem pro porozumění tak mocného nástroje, jakým Git je.

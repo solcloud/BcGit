@@ -1,0 +1,10 @@
+[[k_zaciname_s_vcs]]
+== Systémy pro správu verzí
+
+Systémy pro správu verzí se začaly objevovat již v 60. letech 20. století. Základní princip systému pro správu verzí však zůstal stejný a v této kapitole bude vysvětlen spolu s rozdělením a krátkou historií systémů pro správu verzí.
+
+include::sekce/co_je_to_vcs.adoc[]
+
+include::sekce/rozdeleni_vcs.adoc[]
+
+include::sekce/historie.adoc[]

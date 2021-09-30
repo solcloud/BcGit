@@ -1,0 +1,15 @@
+[[k_princip_gitu]]
+== Princip Gitu
+
+Předchozí kapitola byla zakončena vytvořením prvního snímku projektu pomocí příkazu `git commit`. V této kapitole bude podrobněji vysvětlen princip Gitu.
+
+[quote,'volně přeloženo z [15]']
+____
+Git je v podstatě obsahově adresovatelný souborový systém s uživatelským rozhraním verzovacího systému postaveném nad tímto souborovým systémem.
+____
+
+include::sekce/objekty.adoc[]
+
+include::sekce/vyhody_otisku.adoc[]
+
+include::sekce/reference.adoc[]

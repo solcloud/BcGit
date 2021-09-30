@@ -1,0 +1,33 @@
+[[k_rozdeleni_vcs]]
+=== Rozdělení verzovacích systémů
+
+Verzovací systémy se dělí na dvě hlavní kategorie (řešení) podle přístupu k repozitáři.
+
+. Centralizované systémy
+. Decentralizované (distribuované) systémy
+
+==== Centralizované systémy
+
+Centralizované řešení je starší, používá *pouze jeden* (centrální) repozitář, ke kterému mají přístup všichni zúčastnění na projektu (nejčastěji pomocí úložiště v síti). Centralizovaný systém pracuje na principu **klient-server**, kde server je onen *centrální repozitář s kompletní historii projektu* a klienti jsou uživatelé pracující na projektu. Klienti mají *pouze poslední verze souborů projektu* uložené v pracovním adresáři projektu na svém disku, případně rozpracované nové verze čekající na odeslání do repozitáře.
+
+Práce s centralizovaným systémem probíhá tak, že když chceme pracovat na projektu, provedeme nejprve aktualizaci s centrálním repozitářem. Po této aktualizaci se stáhnou *pouze poslední verze všech souborů* uložené v centrálním repozitáři (pokud již nemáme pracovní adresář projektu aktuální) a následně se pomocí procesu začlenění (*merge*) tyto změny přenesou do našeho pracovního adresáře projektu. Po začlenění můžeme upravovat jednotlivé soubory projektu a v případě potřeby __commit__nout novou verzi na server (například pro zpřístupnění dat kolegovi nebo uložení současného stavu do historie projektu).
+
+[[img_centralizovany]]
+.Schéma centralizovaného verzovacího systému [autor]
+image::centralizovany.svg["Schéma centralizovaného verzovacího systému [autor\]",scaledwidth=80%]
+
+Nevýhodou centralizovaného řešení je, že pokud nejsme připojeni k síti, nemůžeme pracovat s repozitářem (prohlížet, stahovat či nahrávat změny). Kvůli nutnosti posílat data po síti je také práce s repozitářem pomalejší. A posledním problémem je, že například v případě selhání disku serveru či jiném vážném poškození, pokud nemáme vytvořené zálohy, ztratíme veškerou historii projektu, neboť historie projektu se ukládá pouze na serveru.
+
+==== Decentralizované (distribuované) systémy
+
+Distribuované řešení je vylepšením centralizovaného přístupu. Hlavní rozdíl je, že nejsou závislé pouze na jednom repozitáři, ale fungují na principu **peer-to-peer** (rovný s rovným). V distribuovaném přístupu má každý člen projektu **na svém disku uložen svůj vlastní (osobní) repozitář s kompletní historii projektu**, který si je rovný se zbylými repozitáři. Rovný znamená, že každý člen projektu může stahovat z repozitáře, případně nahrávat do repozitáře kteréhokoli jiného člena (každý může vystupovat zároveň jako {lu}klient{pu} či {lu}server{pu}), pokud je pro něj daný repozitář dostupný (přístup po síti, lokální práva pro přístup k souborům). S přibývajícím počtem uživatelů zúčastněných na projektu však nutnost stahovat veškeré změny od všech členů týmu se stává zdržováním, a proto se většinou zvolí pouze jedenfootnote:[U větších projektů bývá členění daleko složitější hlavně kvůli rozdělení do menších logických částí projektů (modulů) a kvůli omezení přístupových práv k repozitáři.] repozitář, který je dobře přístupný (nejčastěji úložiště v síti) a tento repozitář se označí jako **hlavní**.footnote:[Většinou se tento repozitář nazývá centrální, ale aby nedocházelo k záměně s centralizovanými systémy, je v této práci použit výraz hlavní.] S tímto hlavním repozitářem se ostatní členové týmu synchronizují.
+
+Každý, kdo chce na projektu pracovat, si vytvoří repozitář nový, případně si z již existujícího repozitáře zkopíruje (*naklonuje*) svůj osobní repozitář obsahující celou historii projektu, která byla uložená v repozitáři ze kterého byl klon vytvořen. Z takto vytvořeného repozitáře lze vytvářet další klony (repozitáře). 
+
+Postup práce v distribuovaném systému začíná tak, že si nejdříve {lu}natáhneme{pu} (*pull*) veškerou historii z některého z dostupných repozitářů (nejčastěji je to repozitář, ze kterého jsme náš repozitář klonovali, ale není to pravidlo) do našeho osobního repozitáře. _Pull_ po stažení veškerých dat provede proces začlenění dat do pracovního adresáře projektu. Nyní můžeme provést změny v projektu a v případě potřeby __commit__nout novou verzi do našeho osobního repozitáře. Pokud chceme změny odeslat i do repozitáře jiného člena týmu či do hlavního repozitáře, stačí {lu}natlačit{pu} (*push*) změny do daného repozitáře. Vzhledem k dynamičnosti propojení repozitářů v distribuovaném řešení lze vytvořit nekonečně mnoho schémat zapojení, jedno takové schéma ukazuje obrázek <<img_decentralizovany>>.
+
+Výhodou distribuovaného řešení je, že každý klon obsahuje veškerou historii projektu, takže v případě výpadku některého repozitáře (třeba hlavního) lze zvolit repozitář libovolného člena týmu (nejčastěji toho, kdo má nejaktuálnější historii projektu), který nahradí funkci hlavního repozitáře. Další výhodou je, že náš osobní repozitář je uložen na našem lokálním disku, tudíž operace s repozitářem probíhá velice rychle (v porovnání s centralizovaným systémem). Také odpadá nutnost pracovat s repozitářem pouze pokud jsme připojeni k síti. V distribuovaném řešení můžeme ukládat změny průběžně do svého repozitáře bez přístupu k síti, a jakmile se připojíme k síti, můžeme __push__nout změny do repozitáře kolegy či hlavního repozitáře projektu.
+
+[[img_decentralizovany]]
+.Schéma decentralizovaného verzovacího systému [autor]
+image::decentralizovany.svg["Schéma decentralizovaného verzovacího systému [autor\]",scaledwidth=80%]

@@ -1,0 +1,29 @@
+[[k_zaciname_s_gitem]]
+== Verzovací systém Git
+V minulé kapitole byly probrány základní informace o verzovacích systémech. V této kapitole začneme pracovat s verzovacím systémem Git.
+
+include::sekce/co_je_to_git.adoc[]
+
+include::sekce/historie_gitu.adoc[]
+
+include::sekce/architektura_gitu.adoc[]
+
+include::sekce/kategorie_souboru_v_gitu.adoc[]
+
+include::sekce/instalace_gitu.adoc[]
+
+include::sekce/popis_projektu.adoc[]
+
+include::sekce/vytvoreni_wd.adoc[]
+
+include::sekce/vytvoreni_repa.adoc[]
+
+include::sekce/slozka_git.adoc[]
+
+include::sekce/git_status.adoc[]
+
+include::sekce/vytvoreni_prvniho_souboru.adoc[]
+
+include::sekce/pridani_nesledovanych_do_indexu.adoc[]
+
+include::sekce/ulozeni_do_repa.adoc[]

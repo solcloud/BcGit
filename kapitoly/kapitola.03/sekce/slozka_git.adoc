@@ -1,0 +1,36 @@
+[[s_git_folder]]
+=== Složka .git
+
+Pokud se podíváme na obsah pracovního adresáře projektu pomocí příkazu `ls`, zjistíme, že ve složce __git_snake__ není žádná složka _.git_, což nesouhlasí s tím, co vypsal Git v příkladu <<pr_vytvoreni_repa>>.
+
+.Výpis obsahu pracovního adresáře projektu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* ls
+# příkaz ls vrátí prázdný výsledek (prázdný adresář)
+----
+====
+
+Složka _.git_ se ve výpisu nezobrazuje, neboť je ve výchozím nastavení skrytá. Hlavní důvod, proč Git skrývá složku _.git_, je ten, že tato složka je repozitář projektu. Repozitář mimo jiné obsahuje i veškerou historii projektu, proto je lepší, že je tato složka skrytá, aby ji uživatel omylem nesmazal, a nepřišel tak o veškerou historii projektu. Pro zobrazení skrytých souborů (složek) musíme použít například přepínač __-A__ příkazu `ls`. 
+
+.Výpis obsahu složky .git
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* ls -A
+.git
+*$* ls -p .git
+HEAD  config  description  hooks/  info/  objects/  refs/
+----
+====
+
+Příkaz `ls -A` již vrátil hledanou složku __.git__. Pokud se podíváme pomocí `ls -p .git` na obsah složky _.git_, zjistíme, že zde jsou soubory __HEAD, config, description__ a složky __hooks, info, objects, refs__.
+
+Přepínač __-p__ příkazu `ls` slouží k vizuálnímu oddělení typu souborů. Složky mají na konci názvu lomítko, soubory nikoli. Pro zobrazení nápovědy unixových příkazů lze použít přepínač __--help__ obdobně jako u příkazů Gitu, například `ls --help`.
+
+Obsah složky __.git__ bude rozebrán podrobněji v následujících kapitolách. V tuto chvíli je dobré pouze vědět, že tato složka existuje a jak lze vypsat její obsah.

@@ -1,0 +1,524 @@
+=== Clone
+
+Do projektu _GitSnake_ se rozhodl přidat další vývojář, kterého nazveme *Bob*. Bob si chce naklonovat repozitář _GitSnake_ a provést úpravy.
+
+Pro práci v roli Boba můžeme vytvořit nový uživatelský účet v našem operačním systému anebo zůstat přihlášeni pod současným uživatelským účtem a vydávat se za Boba. Vytvoření repozitáře Boba provedeme pomocí příkazu `git clone <zdrojový repozitář> <cílový repozitář>`:
+
+.Vytvoření repozitáře Boba
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob}
+*$* git clone {hlavni} {bob-snake}
+Cloning into '{bob-snake}'...
+done.
+*$* cd {bob-snake}
+*$* git config user.name Bob ;; <1>
+*$* git config user.email bob@uhk.nm
+*$* git checkout -b develop origin/develop ;; <2>
+Branch develop set up to track remote branch develop from origin.
+Switched to a new branch 'develop'
+*$* git remote ;; <3>
+origin
+----
+<1> Upravíme lokální nastavení repozitáře pro rozlišení uživatele.
+<2> Přepneme se na novou větev _develop_ vytvořenou z reference _origin/develop_. Git automaticky nastavil pro tuto větev sledování vzdálené větve _origin/develop_.
+<3> Pro vypsání referencí na vzdálené repozitáře použijeme příkaz `git remote`.
+====
+
+Příkaz `git clone` naklonovalfootnote:[Díky tomu, že klonovaný repozitář je na stejném lokálním disku jako cílový repozitář, Git použil optimalizaci souborového systému. Pro skutečné klonování bychom museli použít _FILE_ protokol nebo přepínač __--no-local__ příkazu `git clone`.] všechny objekty a reference z klonovaného repozitáře a také provedl _checkout_ větve, na kterou odkazuje _HEAD_ v klonovaném repozitáři (_master_) do složky specifikované Bobem. Příkaz `git clone` také vytvořil vzdálený repozitář, který se ve výchozím nastavení jmenuje *origin*. Bob má nyní staženou celou historii projektu _GitSnake_ a také odkaz na originální repozitář, ze kterého byl tento klon vytvořen (_origin_).
+
+Bob se rozhodl upravit estetickou stránku projektu _GitSnake_, a proto změnil soubor _play.htm_ a provedl commit.
+
+.play.htm
+[subs=+quotes]
+....
+<head><meta charset="UTF-8"><title>GitSnake</title>
+<style>#canvas { border: 2px solid black; **display: block; margin: 0 auto;** }</style>
+</head>
+....
+
+.Horizontální vycentrování plátna na stránce
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git add play.htm
+*$* git commit -m "Horizontální vycentrování plátna na stránce"
+[develop c100627] Horizontální vycentrování plátna na stránce
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+*$* git remote rename origin hlavni ;; <1>
+*$* git push --quiet ;; <2>
+----
+<1> Pro přehlednost přejmenujeme referenci _origin_ na _hlavni_.
+<2> Pro ušetření místa bude pro určité příkazy použit přepínač __--quiet__, který slouží k zamezení výpisu daného příkazu. Pro čtenáře je ovšem doporučeno psát příkazy bez přepínače __--quiet__. Díky nastavení sledovaných větví lze použít samotný příkaz `git push`, který odešle nové objekty *aktuální* větve do vzdáleného repozitáře a provede _fast-forward_ začlenění.
+====
+
+[[git_fetch]]
+=== Fetch
+
+Pro stažení nových změn ze vzdáleného repozitáře do našeho repozitáře použijeme příkaz `git fetch`. `Git fetch` aktualizuje pouze vzdálené větve. Vzhledem k tomu, že repozitář Dana má propojené lokální větve _master_ a __develop__ se vzdálenými větvemi z hlavního repozitáře, stačí zadat pouze samotný příkaz `git fetch`, pokud jsme ve větvi _master_ nebo _develop_ pro stažení aktualizací z hlavního repozitáře.
+
+.Stažení aktuálních dat ze vzdáleného repozitáře
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git status
+On branch develop
+Your branch is up-to-date with 'hlavni/develop'. ;; <1>
+nothing to commit, working directory clean
+*$* git fetch --quiet
+*$* git status
+On branch develop
+Your branch is behind 'hlavni/develop' by 1 commit, and can be fast-forwarded. ;; <2>
+  (use "git pull" to update your local branch)
+nothing to commit, working directory clean
+*$* git diff --unified=1 HEAD hlavni/develop ;; <3>
+diff --git a/play.htm b/play.htm                                                          
+index 849fff2..d33048d 100644                                                             
+--- a/play.htm                                                                            
++++ b/play.htm                                                                            
+@@ -2,3 +2,3 @@
+ <head><meta charset="UTF-8"><title>GitSnake</title>
+-<style>#canvas { border: 2px solid black; }</style>
++<style>#canvas { border: 2px solid black; display: block; margin: 0 auto; }</style>
+ </head>
+*$* git diff --unified=0 --word-diff HEAD hlavni/develop ;; <4>
+diff --git a/play.htm b/play.htm
+index 849fff2..d33048d 100644
+--- a/play.htm
++++ b/play.htm
+@@ -3 +3 @@
+<style>#canvas { border: 2px solid black; {+display: block; margin: 0 auto;+} }</style>
+*$* git merge --quiet hlavni/develop ;; <5>
+----
+<1> Díky sledování vzdálené větve _hlavni/develop_ příkaz `git status` vypisuje, že podle poslední aktualizace (`git fetch`) lokální větev _develop_ odkazuje na stejný commit jako vzdálená větev _hlavni/develop_.
+<2> Po provedení příkazu `git fetch` už `git status` vypisuje, že větev _develop_ je o jeden commit pozadu oproti _hlavni/develop_ a také že lze provést začlenění metodou _fast-forward_.
+<3> Použití příkazu `git diff` pro zobrazení rozdílu mezi _HEAD_ a __hlavni/develop__. Přepínač __-&#xFEFF;-&#xFEFF;unified=<N>__ specifikuje kolik řádků kontextu se bude v __diffu__ zobrazovat.
+<4> Zobrazení _diffu_ jednotlivých slov (__--word-diff__) namísto řádků.
+<5> Změny od Boba se nám líbí, a proto provedeme začlenění změn z větve _hlavni/develop_ do aktuální větve (_develop_).
+====
+
+=== Spolupráce v týmu
+
+Bob se rozhodl intenzivně spolupracovat na projektu _GitSnake_, proto jsme se sešli na schůzi a domluvili jsme se, že Bob provede implementaci funkce v případě ukončení hry a my (Dan) vytvoříme ovládání hada pomocí ovládacích šipek klávesnice. Začneme našimi změnami, tedy vytvořením nové větve _feature/entity-control_:
+
+.Vytvoření větve pro ovládání entity
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git branch
+* develop
+  master
+*$* git checkout -b feature/entity-control
+Switched to a new branch 'feature/entity-control'
+----
+====
+
+Upravíme následující soubory:
+
+.js/SquareObject.js
+[subs=+quotes]
+....
+    } animate() {
+        this.position.x += this.velocity.x; this.position.y += this.velocity.y;
+    }** turn(velX, velY) {
+        this.velocity.x = velX; this.velocity.y = velY;
+    }**
+}
+....
+
+.play.htm
+[subs=+quotes]
+....
+    var game = new GitSnake.Game(document.getElementById("canvas"), 20, 30);
+    **var snake = game.snake;**
+
+    window.addEventListener("keydown", function (e) {
+        switch (e.keyCode) {**
+            case 38: return game.isPlaying && snake.turn( 0, -1);
+            case 40: return game.isPlaying && snake.turn( 0,  1);
+            case 37: return game.isPlaying && snake.turn(-1,  0);
+            case 39: return game.isPlaying && snake.turn( 1,  0);**
+            case 27: case 32:
+....
+
+Po uložení a zkontrolování ve webovém prohlížeči, že lze ovládat hada pomocí ovládacích šipek klávesnice, provedeme opět rozdělení na dva commity pro každý soubor zvláště:
+
+.Ovládání hada šipkami
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git add -u ;; <1>
+*$* git reset HEAD play.htm ;; <2>
+Unstaged changes after reset:
+M       play.htm ;; <3>
+*$* git commit -m "Přidání turn metody ve SquareObject.js" ;; <4>
+[feature/entity-control 07e8f32] Přidání turn metody ve SquareObject.js
+ 1 file changed, 2 insertions(+)
+*$* git commit -a -m "Ovládání hada pomocí šipek klávesnice"
+[feature/entity-control ba70595] Ovládání hada pomocí šipek klávesnice
+ 1 file changed, 5 insertions(+)
+*$* git checkout --quiet develop
+*$* git merge --quiet feature/entity-control
+*$* git branch --quiet -d feature/entity-control
+*$* git push --quiet
+----
+<1> Příkazu `git add` jsme předali přepínač _-u_, který přidá všechny sledované změněné soubory do indexu.
+<2> Příkaz `git reset HEAD play.htm` zkopíruje soubor _play.htm_ z __HEAD__ do indexu, kde přepíše dříve přidanou změněnou verzi souboru _play.htm_. Příkaz _reset_ v tomto případě nezmění nic v pracovním adresáři projektu, kde máme stále uloženou změnu v souboru _play.htm_.
+<3> Git vypisuje informaci, že po nahrazení verze souboru _play.htm_ v indexu verzí z __HEAD__ je stále soubor _play.htm_ v pracovním adresáři projektu změněný (*M*) oproti verzi v indexu. footnote:[S obdobným formátem výstupu se lze setkat například při použití příkazu `git status -s`.]
+<4> V commitu bude změněný pouze soubor _SquareObject.js_, pro kontrolu následujícího commitu lze využít příkaz `git diff --staged`. Tento příkaz je dobré spouštět před každým commitem.
+====
+
+Pro pokročilou práci s indexem lze využít příkaz `git add --patch` pro přidávání části souborů (*hunk*), případně obecnější verzi `git add --interactive`. Pro odebírání částí souborů z indexu Git nabízí příkaz `git reset --patch`. 
+
+Bob pracoval paralelně s námi na implementaci ukončení hry. Bob vytvoří novou větev __feature/&#xFEFF;game-&#xFEFF;over__ z commitu, na který odkazuje větev _develop_, která vyřeší ukončení hry v případě nárazu hlavy hada do okraje plátna (zdi) nebo v případě dokončení hry.
+
+.Vytvoření větve pro ukončení hry
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git branch
+*  develop
+   master
+*$* git checkout -b feature/game-over
+Switched to a new branch 'feature/game-over'
+----
+====
+
+Bob upraví soubor _Game.js_ následovně:
+
+.js/Game.js
+[subs=+quotes]
+....
+    } animate() {
+        this.gameObjects.forEach(function (entity) {
+            entity.animate();
+        }, this);
+        **this.checkGameOverConditons();
+    } checkGameOverConditons() {
+        if (this.snake.length >= this.tileX * this.tileY - 1)
+            return this.gameOver("Vyhráli jste!");
+        var spos = this.snake.position;
+        if (spos.x < 0 || spos.x > this.tileX - 1)
+            return this.gameOver();
+    } gameOver(text = "Prohráli jste!") {
+        this.pause(); this.isGameOver = true;
+        alert( text + "\nVaše skóre: " + this.score );
+        location.reload();**
+    } play() {
+        if (!this.isPlaying && !this.isGameOver) {
+....
+
+Po uložení a zkontrolování toho, že had po přejetí plátna narazí do zdi a hra se ukončí, Bob provede commit.
+
+.Přidání ověření pro konec hry
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git add js/Game.js
+*$* git commit -m "Přidání ověření pro konec hry"
+[feature/game-over 1a02b1b] Přidání ověření pro konec hry
+ 1 file changed, 11 insertions(+)
+----
+====
+
+Bob ovšem nemůže s hadem hýbat a tedy ověřit, zdali nová funkce funguje podle očekávání, protože na této části pracuje Dan. Naštěstí Dan prý již nahrál své změny do větve _develop_ v hlavním repozitáři a Bob si je tedy může stáhnout a začlenit.
+
+.Začlenění změn od Dana
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git checkout develop
+Switched to branch 'develop'
+Your branch is up-to-date with 'hlavni/develop'.
+*$* git fetch --quiet
+*$* git log --oneline HEAD..hlavni/develop ;; <1>
+ba70595 Ovládání hada pomocí šipek klávesnice
+07e8f32 Přidání turn metody ve SquareObject.js
+*$* git merge --quiet hlavni/develop
+----
+<1> Zápis __<A>**..**<B>__ slouží pro získání objektů, které jsou v __B__ navíc oproti _A_.
+====
+
+=== Rebase 
+
+Změny od Dana jsou nyní v repozitáři Boba ve větvi _develop_ a __hlavni/develop__ (viz obrázek <<img_rebase_before>>). Začlenění změn z větve _develop_ do větve _feature/game-over_ (nebo obráceně) můžeme provést pomocí klasického začlenění (`git merge`), ovšem v tomto případě by došlo k __rekurzivní__ strategii začlenění a historie projektu by se zbytečně zkomplikovala. Proto použijeme příkaz `git rebase`, který {lu}vezme{pu} změny v commitech aktuální větve oproti společnému předku aktuální větve a větve nad kterou se provádí _rebase_ a tyto změny aplikuje jako nové commity nad danou větví. `Git rebase` také nastaví referenci aktuální větve, aby odkazovala na nově vytvořené commity (viz obrázek <<img_rebase_after>>). Příkaz `git rebase` vytváří nové commity, proto tyto commity mají jiné otisky než commity původní. Pro interaktivní použití _rebase_ lze použít příkaz `git rebase --interactive`. Tento příkaz se hodí pro {lu}zkrášlení{pu} historie větve, která nebyla odeslána do vzdáleného repozitáře.
+
+[[img_rebase_before]]
+.Historie před rebase [autor]
+image::rebase-before.svg[Historie před rebase [autor\]",scaledwidth=57%]
+
+.Rebase změn od Dana
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git checkout - ;; <1>
+Switched to branch 'feature/game-over'
+*$* git rebase develop ;; <2>
+First, rewinding head to replay your work on top of it...
+Applying: Přidání ověření pro konec hry
+----
+<1> Přepneme se na větev, kterou chceme aktualizovat. Pro přepnutí na předchozí aktuální větev lze předat parametr *-* příkazu `git checkout`.
+<2> Příkazu `git rebase` jsme předali odkaz, nad kterým chceme vytvořit nové commity. Zde bychom mohli použít i odkaz _hlavni/develop_, neboť tento odkaz odkazuje na stejný commit jako _develop_.
+====
+
+[[img_rebase_after]]
+.Historie po rebase [autor]
+image::rebase-after.svg[Historie po rebase [autor\]",scaledwidth=70%]
+
+Nyní má Bob ve větvi _feature/game-over_ jak změněné soubory od Dana s ovládáním hada, tak také změnu pro ukončení hry. Díky použití _rebase_ namísto _merge_ jsou commity lineární. Po vyzkoušení ve webovém prohlížeči Bob zjistil, že hra se ukončí pouze při nárazu do levé nebo pravé stěny. Tuto chybu Bob opraví upravením souboru _js/Game.js_:
+
+.js/Game.js
+[subs=+quotes]
+....
+        var spos = this.snake.position;
+        if (spos.x < 0 || spos.x > this.tileX - 1 **|| spos.y < 0 || spos.y > this.tileY - 1**)
+            return this.gameOver();
+    } gameOver(text = "Prohráli jste!") {
+....
+
+Bob je v týmu projektu _GitSnake_ nový, a proto nechce vytvářet další commit, který by navždy uložil v historii jeho chybu, ale chce {lu}upravit{pu}footnote:[Již víme, že nelze upravit obsah objektu, aniž by nedošlo ke změně otisku, proto Git nemění objekty, ale vytváří objekty nové.] commit předešlý, který by {lu}sloučil{pu} s aktuální změnou v pracovním adresáři. Naštěstí Bob ještě neprovedl odeslání změn do hlavního repozitáře a všechny změny jsou zatím pouze v Bobově lokálním repozitáři.
+
+=== Amend
+
+Pro změnu posledního provedeného commitu Git poskytuje například přepínač __--amend__ příkazu `git commit`. Přidáme do indexu soubor _js/Game.js_ a provedeme příkaz `git commit --amend`, který sloučí změny v posledním commitu (_HEAD_) s aktuálním indexem a vytvoří commit nový, na který přesune referenci _feature/game-over_.
+
+.Změna posledního commitu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git add js/Game.js
+*$* git commit --amend -m "Restart hry v případě výhry či prohry"
+[feature/game-over d448862] Restart hry v případě výhry či prohry
+Date: Fri Apr 22 14:35:46 2016 +0100
+ 1 file changed, 11 insertions(+)
+*$* git checkout --quiet develop
+*$* git fetch ;; <1>
+*$* git merge --quiet feature/game-over
+*$* git branch --quiet -d feature/game-over
+*$* git push --quiet
+----
+<1> Spuštění příkazu `git fetch` pro kontrolu zdali nedošlo ke změnám v hlavním repozitáři od poslední aktualizace. Příkaz `git fetch` je dobré spouštět před každým vytvořením nové větve ze sledované větve a také před každým sjednocením či _rebase_.
+====
+
+=== Tag
+
+Nyní je ve větvi _develop_ v Bobově repozitáři, a také v hlavním repozitáři implementované jak ovládání pomocí ovládacích šipek klávesnice, tak i ukončení hry při nárazu hlavy hada do zdi nebo v případě dokončení hry. Projekt _GitSnake_ pomalu začíná připomínat skutečnou hru had. V tuto chvíli se můžeme rozhodnout, že hra prošla důležitým milníkem a my tento milník chceme uchovat v historii projektu. Pro ukázku Bob začlení větev _develop_ do větve _master_ a vytvoří štítek _v0.2.0_.
+
+.Začlenění větve develop do větve master
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git checkout --quiet master
+*$* git merge --quiet develop
+*$* git tag -a -m "Had ovládán šipkami a ukončení hry" v0.2.0
+*$* git push --quiet --tags ;; <1>
+*$* git push --quiet
+----
+<1> Pro odeslání pouze všech štítků musíme specifikovat přepínač __--tags__.
+====
+
+Po vydání projektu _GitSnake_ ve verzi _0.2.0_ testerům se zjistil velký nedostatek projektu a sice, že had neustále {lu}roste{pu}, i když by měl mít zatím pouze hlavu a jednu část ocasu. Tento nedostatek je nutno rychle opravit a vydat novou verzi pro testování. Bob upraví soubor _Game.js_ ve větvi _master_ následovně:
+
+.js/Game.js
+[subs=+quotes]
+....
+    } draw() {
+        **this.ctx.clearRect(0, 0, this.width, this.height);**
+        this.gameObjects.forEach(function (entity) {
+            entity.draw(this.ctx);
+....
+
+Po vizuálním ověření ve webovém prohlížeči a spuštění automatizovaných testů Bob provede commit a označení nové verze:
+
+.Hotfix přemazávání plátna
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git add js/Game.js
+*$* git commit --quiet -m "Oprava mazání plátna v Game.js:draw()"
+*$* git tag -a -m "Oprava překreslení plátna" v0.2.1
+*$* git push --quiet --tags
+*$* git push --quiet
+*$* git checkout --quiet develop
+*$* git merge --quiet master
+*$* git push --quiet
+----
+====
+
+[[git_remove]]
+=== Odstranění souborů (rm)
+
+Pro odstranění sledovaného souboru stačí tento soubor smazat v indexu a provést commit, který daný soubor smaže ve snímku projektu. Takto smazaný soubor je však stále dostupný v historii projektu.footnote:[Pro odstranění souboru z celé historie projektu lze použít příkaz `git filter-branch`, ovšem tento příkaz patří mezi pokročilejší příkazy.] Pro ukázku Bob odstraní soubor _play.htm_:
+
+[[pr_git_rm]]
+.Odstranění souboru
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git rm play.htm
+rm 'play.htm' ;; <1>
+*$* git commit -m "Odstranění souboru play.htm"
+[develop e838400] Odstranění souboru play.htm
+ 1 file changed, 32 deletions(-)
+ delete mode 100644 play.htm
+*$* git push --quiet
+----
+<1> Příkaz `git rm <název>` kromě odstranění daného souboru z indexu také spustí unixový příkaz `rm <název>`, který odstraní daný soubor z pracovního adresáře projektu.
+====
+
+=== Revert
+
+V kapitole <<git_remove>> Bob provedl odstranění souboru _play.htm_. Toto odstranění, konkrétně commit z příkladu <<pr_git_rm>>, byl omyl, a proto by Bob tento commit chtěl {lu}vrátit{pu}. Pokud by byl commit pouze v Bobově repozitáři, nebyl by problém commit {lu}upravit{pu}, ale jelikož byl tento commit odeslán do hlavního repozitáře, je zde možnost, že si již tento commit někdo stáhl, a proto Bob nemůže tento commit v hlavním repozitáři nahradit jiným, neboť by to negativně ovlivnilo všechny uživatele, kteří si commit již stáhli. Pro vrácení commitu můžeme použít příkaz `git revert <commit>`, který commit v parametru zneguje. Příkaz `git revert` ovšem nenahradí negovaný commit, pouze vytvoří nový commit, který zneguje změny commitu v parametru, tedy přidání nahradí odstraněním a obráceně.
+
+.Vrácení změn commitu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git revert --no-edit HEAD ;; <1>
+[develop c8ff334] Revert "Odstranění souboru play.htm"
+ 1 file changed, 32 insertions(+) ;; <2>
+ create mode 100644 play.htm
+*$* git push --quiet
+----
+<1> Přepínač __--no-edit__ slouží k ponechání výchozího popisu změny, který vytvořil Git automaticky.
+<2> Počet vložených řádků je stejný jako počet odstraněných řádků v příkladu <<pr_git_rm>>.
+====
+
+=== Show
+
+Příkaz `git show` je základní příkaz pro zobrazování informací o objektech v Gitu. Pokud zadáme pouze příkaz `git show`, který automaticky dosadí _HEAD_ jako referenci, dostaneme informace o posledním commitu, včetně vypsání _diffu_. Příkaz `git show <reference>:<cesta k souboru>` zase zobrazí obsah souboru v dané cestě, tak jak byl uložen v dané referenci. Pro zobrazení komentovaného štítku příkaz `git show <štítek>` zobrazí jak informace o štítku, tak i o objektu, na který štítek odkazuje, proto musíme použít symbolickou referenci. Například pro zobrazení commitu, na který odkazuje štítek _v0.2.0_, použijeme příkaz `git show "v0.2.0^{commit}"`. Obdobně můžeme zobrazit kořenový strom větve _master_ `git show "master^{tree}"`.
+
+=== Alias
+
+Git umožňuje vytvoření aliasů pro příkazy. Například v příkladu <<pr_graph>> jsme použili příkaz `git log -&#xFEFF;-&#xFEFF;oneline -&#xFEFF;-&#xFEFF;decorate -&#xFEFF;-&#xFEFF;graph`, který poskytuje přehled o historii projektu. Abychom nemuseli tento příkaz neustále psát, můžeme pro něj vytvořit alias v konfiguračním souboru Gitu.
+
+[[pr_alias]]
+.Vytvoření globálního aliasu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Boba
+{bob-snake}
+*$* git config --global alias.l "log --oneline --decorate --graph"
+*$* git l HEAD -2 ;; <1>
+* c8ff334 (HEAD -> develop, hlavni/develop) Revert "Odstranění souboru play.htm"
+* e838400 Odstranění souboru play.htm
+----
+<1> Aliasům lze přidávat i další parametry a přepínače. Zde jsme předali parametr _HEAD_ pro referenci odkud má Git začít logovat, a přepínač _-2_ pro specifikování vypsání pouze dvou posledních commitů historie.
+====
+
+Aliasy v Gitu jsou výborné pro ušetření psaní dlouhých příkazů, ovšem stále je nutné psát příkaz `git <alias>`. Pro pokročilejší definování aliasů lze využít například aliasy konzolového interpretu.
+
+=== Pull
+
+Příkaz `git pull` slouží pro provedení aktualizace a následně případné začlenění nových commitů do aktuální větve podle parametrů definovaných v nastavení repozitáře. `Git pull` je tedy zkratka pro spuštění příkazu `git fetch` následovaném příkazem `git merge`. Pro ukázku se vrátíme do role Dana a provedeme příkaz `git pull`:
+
+.Git pull
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git log --oneline --decorate -1
+ba70595 (HEAD -> develop) Ovládání hada pomocí šipek klávesnice
+*$* git pull --quiet --ff-only ;; <1>
+*$* git log --oneline --decorate -5
+c8ff334 (HEAD -> develop, hlavni/develop) Revert "Odstranění souboru play.htm"
+e838400 Odstranění souboru play.htm
+a0a0d97 (tag: v0.2.1, hlavni/master) Oprava mazání plátna v Game.js:draw()
+d448862 (tag: v0.2.0) Restart hry v případě výhry či prohry
+ba70595 Ovládání hada pomocí šipek klávesnice
+----
+<1> Přepínač __--ff-only__ znamená, že chceme provést začlenění pouze pokud lze provést __fast-&#xFEFF;forward__ začlenění.
+====
+
+Pro použití _rebase_ namísto _merge_ lze použít přepínač __--rebase__ příkazu `git pull`.
+
+=== Describe
+
+Příkaz `git describe <commit>` slouží pro výpis Gitem generované verze v závislosti na posledním dosažitelném štítku z commitu definovaném v parametru.
+
+.Generování verze z git describe
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* git describe
+v0.2.1-2-gc8ff334 ;; <1>
+*$* git describe v0.2.0~3
+v0.1.0-9-gc100627
+----
+<1> Výstupem příkazu je formát: __<první dosažitelný štítek z commitu v parametru>-<počet commitů od tohoto štítku do commitu v parametru>-g<část otisku commitu v parametru>__
+====
+
+[[git_ignore]]
+=== Ignorování souborů
+
+Při vytváření projektu se lze setkat s mnoha soubory, které nechceme verzovat. Mezi soubory, které bychom neměli verzovat, patří soubory nesouvisející s projektem (dočasné soubory operačního systému či editoru), binární soubory (které lze vygenerovat ze zdrojových souborů) apod. Aby se tyto soubory stále neobjevovaly jako nesledované soubory, lze tyto soubory přidat mezi ignorované. Git pro práci s ignorovanými soubory nabízí tři možnosti jak lze soubory ignorovat:
+
+* .gitignore {pomlcka} seznam ignorovaných souborů pro všechny uživatele projektu. Tento soubor je součástí historie projektu.footnote:[Výjimka nastane, pokud do obsahu souboru _.gitignore_ přidáme samotný název souboru _.gitignore_.] Soubor _.gitignore_ lze použít i v podsložkách projektu.
+* .git/info/exclude {pomlcka} seznam ignorovaných souborů pouze pro projekt, ve kterém je tento soubor uložen.
+* config {pomlcka} seznam ignorovaných souborů definovaných v souboru specifikovaném v nastavení Gitu (klíč _core.excludesFile_). Lze použít přepínače příkazu `git config` pro specifikování úrovně použití.
+
+V projektu _GitSnake_ nemáme žádné soubory, které bychom měli v tuto chvíli ignorovat pro potřeby projektu, ovšem jako vývojáři projektu si můžeme definovat globálně, které soubory chceme ignorovat v závislosti na tom, jaké nástroje používáme. Například většina textových editorů ukládá zálohy (kopie) aktuálně editovaných souborů do stejné složky, ve které je uložený originální soubor.
+
+Pro ukázku použití souboru _.gitignore_ vytvoříme složku _images_ v pracovním adresáři projektu, která může představovat složku pro ukládání obrázků projektu, které nechceme verzovat:
+
+.Ignorování složky images
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd # Konzole Dana
+{snake}
+*$* mkdir images
+*$* git status ;; <1>
+On branch develop
+Your branch is up-to-date with 'hlavni/develop'.
+nothing to commit, working directory clean
+*$* touch images/.gitkeep ;; <2>
+*$* git status -s ;; <3>
+?? images/
+*$* git add images/.gitkeep
+*$* git commit --quiet -m "Vytvoření složky pro ukládání obrázků"
+*$* echo -n "images" > .gitignore ;; <4>
+*$* git add .gitignore
+*$* git commit --quiet -m "Přidání .gitignore pro složku images" ;; <5>
+*$* touch images/ignorovany_soubor.txt
+*$* git status -s ;; <6>
+----
+<1> Git sleduje pouze soubory, tedy prázdný adresář _images_ se ve výstupu příkazu `git status` nevypisuje ani jako nesledovaný soubor.
+<2> Pro zaznamenání složky _images_ musíme vytvořit alespoň jeden soubor ve složkce _images_. Je zvykem tento soubor pojmenovat _.gitkeep_.
+<3> Přepínač __-s__ příkazu `git status` slouží k výpisu statusu ve stručném formátu.
+<4> Přidáme název složky, kterou chceme ignorovat do souboru _.gitignore_.
+<5> Soubor _.gitignore_ přidáme do historie projektu, aby se vytvoření a ignorování obsahu složky _images_ projevilo i u ostatních vývojářů projektu, kteří si tento commit stáhnou.
+<6> Nově vytvořený soubor _images/ignorovany_soubor.txt_ se neobjevuje jako nesledovaný soubor.
+====

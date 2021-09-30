@@ -1,0 +1,114 @@
+=== Objekty
+
+Objektem v Gitu je myšleno vše, co je uloženo v **objektové databázi**, která se ve výchozím nastavení nachází ve složce _.git/objects/_. Objektová databáze funguje na principu **key-value (klíč-hodnota)**, kde klíčem je **identifikátor objektu** a hodnotou je **obsah objektu**.
+
+[[s_identifikator_objektu]]
+==== Identifikátor objektu
+
+Obdobně jako například knihy mají ISBNfootnote:[https://cs.wikipedia.org/wiki/International_Standard_Book_Number] kód, který jednoznačně identifikuje určitou knihu, Git používá podobnou identifikaci pro odkazování na *objekty* v Gitu. Tato identifikace objektu se v Gitu označuje *otisk*. Git vytváří otisk z **Gitem přidané hlavičky a obsahu objektu** (dále bude pod pojmem **obsah objektu myšlena hlavička + obsah objektu**).footnote:[Formát obsahu objektu je následující: __<typ objektu><mezera><velikost obsahu v bajtech><null byte><obsah>__.]
+
+Otisky Git realizuje pomocí hašovací funkce SHA-1, která z libovolných vstupních dat vytvoří sekvenci 160 bitů. [16] Vlastnost funkcí je ta, že pro stejný vstup (obsah) generují stejný výstup (otisk), jinými slovy soubory s identickým obsahem mají stejné otisky.footnote:[Kvůli pevně danému výstupu 160 bitů z funkce SHA-1 při libovolném vstupu jsou identifikátory objektů považovány za efektivně jednoznačné. Efektivně jednoznačné znamená, že sice je zde pravděpodobnost kolize identifikátoru dvou a více objektů s odlišným obsahem, ovšem tato pravděpodobnost je tak malá, že ji prostě ignorujeme.] Pracovat s výstupem 160 nul a jedniček funkce SHA-1 je nepraktické, proto se tato sekvence v Gitu reprezentuje pomocí čtyřiceti hexadecimálníchfootnote:[https://cs.wikipedia.org/wiki/Šestnáctková_soustava] znaků. SHA-1 otisk může vypadat například následovně:
+
+    763fe41beb3a113bd09fd9bd16762067bf7f1cdb
+
+Pro odkazování na objekt pomocí 40 hexadecimálních znaků je pro uživatele nepraktické, proto lze v Gitu použít pouze tolik prvních hexadecimálních znaků z otisku, kolik je třeba, aby Git nalezl právě jeden objekt s otiskem začínajícím touto sekvencí znaků, minimálně však musejí být napsány znaky čtyři.
+
+<<<
+==== Objektová databáze
+
+Všechny objekty v Gitu jsou neměnnéfootnote:[Neměnné objekty znamenají, že nelze změnit jejich obsah, aniž by nedošlo ke změně otisku.] a jednoznačně se identifikují pomocí zmiňovaného SHA-1 otisku obsahu daného objektu.footnote:[https://en.wikipedia.org/wiki/Content-addressable_storage] Objekty v Gitu se dělí na čtyři typy:
+
+. Commit
+. Strom (tree)
+. Blobfootnote:[https://cs.wikipedia.org/wiki/BLOB]
+. Komentovaný štítek (annotated tag)footnote:[Komentovaný štítek bude probrán v kapitole <<k_annoted_tag>>.]
+
+Pokud vyhledáme všechny soubory v objektové databázi, dostaneme výstup podobný příkladu <<pr_go_first_commit>>.
+
+[[pr_go_first_commit]]
+.Vyhledání souborů v objektové databázi
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* find .git/objects/ -type f ;; <1>
+.git/objects/5e/560c018223107e71f65cdb46fabd65d2889454
+.git/objects/7b/04950e85ed3557721a0ec6a7b94359488cfb0b
+.git/objects/d3/173a992e609a9b03f73239e15610987f11935e 
+----
+<1> Výsledkem vyhledání souborů v objektové databázi jsou tři soubory. Otisky objektů (**názvy souborů**) máme pravděpodobně odlišné.
+====
+
+Aby v objektové databázi časem nebylo příliš mnoho souborů, Git vždy vezme první dva hexadecimální znaky otisku, ze kterých Git vytvoří adresář, a zbylých 38 znaků Git použije jako název souboru v daném adresáři. Tímto způsobem se tak v objektové databázi jednotlivé objekty rozdělí do maximálně 256 podsložek. V Gitu se však na otisky odkazuje pomocí celého otisku (rozdělování do podadresářů je pouze optimalizace pro souborový systém). V následujících sekcích bude rozebráno, k čemu jednotlivé typy objektů slouží a které typy objektů máme aktuálně uloženy v objektové databázi.
+
+==== Commit
+
+V kapitole <<k_ulozeni_do_repa>> jsme vytvořili první commit projektu _GitSnake_, konkrétně v příkladu <<pr_git_commit>> nám Git po provedení commitu vypsal _commit-id_. _Commit-id_ je termín používaný v Gitu pro otisky objektů typu commit. Pravděpodobně tušíme, že jeden z oněch tří souborů v příkladu <<pr_go_first_commit>> bude nejspíše typu commit. Pokud se podíváme na _commit-id_ z příkladu <<pr_git_commit>>, opravdu ve výstupu příkladu <<pr_go_first_commit>> soubor s {lu}názvem{pu} začínajícím {lu}d3173a9{pu} je. Obsahem všech objektů je kvůli ušetření místa na disku __DEFLATE__ komprese samotného obsahu objektu, kvůli této kompresi musíme pro zjištění typu a zobrazení obsahu objektu použít například příkaz z jádra Gitu {pomlcka} `git cat-file`, který s přepínačem _-t_ vrátí typ objektu s daným otiskem jako parametrem a s přepínačem _-p_ vypíše formátovaný obsah objektu (souboru). [15]
+
+[[pr_show_commit]]
+.Zobrazení commitu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git cat-file -t d3173a9
+commit ;; <1>
+*$* git cat-file -p d3173a9 ;; <2>
+tree 5e560c018223107e71f65cdb46fabd65d2889454
+author Daniel Maixner <daniel-maixner@seznam.cz> 1457780038 +0100
+committer Daniel Maixner <daniel-maixner@seznam.cz> 1457780038 +0100
+
+Přidání README projektu
+----
+<1> Objekt s otiskem {lu}d3173a9{pu} je podle očekávání typu commit.
+<2> Obsahem commitu, kromě již známýchfootnote:[Ještě by zde měl být uložen otisk rodiče tohoto commitu, ale jelikož tento commit je kořen, tak zde žádný otisk rodiče uložen není.] údajů (popis, autor a datum změnyfootnote:[Git rozlišuje mezi autorem a datem změny (author) a autorem a datem commitu (committer). Datum je ukládán v obecném (Unix epoch) formátu: __<počet vteřin od 1.1.1970 utc> <časový posun pásma>__.]), je také odkaz na objekt typu *strom* s otiskem {lu}5e560c01{pu}.
+====
+
+==== Strom
+
+Strom v Gitu reprezentuje hierarchickou adresářovou strukturu, konkrétně jeden strom reprezentuje obsah jedné úrovně složky. Obsahem stromu jsou názvy souborů a adresářů v dané úrovni stromu spolu s metadaty (přístupová práva, typ objektu, otisk objektu).footnote:[https://en.wikipedia.org/wiki/Merkle_tree] Vzhledem k hierarchii, kterou stromy vytvářejí, stačí ukládat v commitu pouze strom, který reprezentuje nejvyšší úroveň adresáře (pracovní adresář projektu), tento strom se označuje *kořenový*. Ostatní úrovně zanoření se z tohoto kořenového stromu dají již sestavit. Pro zobrazení obsahu kořenového stromu z příkladu <<pr_show_commit>> využijeme otisk z příkladu <<pr_show_commit>>. Otisk můžeme použít celý _5e560c018223107e71f65cdb46fabd65d2889454_ anebo jen pár prvních znaků, které jednoznačně určí, který objekt chceme zobrazit, většinou prvních 8 znaků je dostačujících.
+
+[[pr_zobrazeni_stromu]]
+.Zobrazení stromu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git cat-file -t 5e560c018223107e71f65cdb46fabd65d2889454
+tree
+*$* git cat-file -p 5e560c01
+100644 blob 7b04950e85ed3557721a0ec6a7b94359488cfb0b    README.txt ;; <1>
+----
+<1> V době commitu z příkladu <<pr_git_commit>> byl v indexu pouze soubor _README.txt_ uložený v kořenovém adresáři. Výstupem příkazu je jeden řádek s otiskem objektu typu *blob* _7b04950e85ed3557721a0ec6a7b94359488cfb0b_, režimem _100644_ a názvem _README.txt_.
+====
+
+==== Blob
+
+Blob v Gitu reprezentuje soubor, přesněji *obsah* souboru. Pro ověření typu a zobrazení obsahu objektu získaného v příkladu <<pr_zobrazeni_stromu>> použijeme opět příkaz `git cat-file`:
+
+[[pr_zobrazeni_blobu]]
+.Zobrazení blobu
+====
+[source,subs="verbatim,attributes,quotes"]
+----
+*$* pwd
+{snake}
+*$* git cat-file -t 7b04
+blob
+*$* git cat-file -p 7b04 ;; <1>
+GitSnake
+
+Vlastni implementace zname hry Snake.
+Projekt slouzi jako ukazka prace v systemu Git.
+----
+<1> Výsledkem příkazu je obsah souboru _README.txt_, tak jak byl uložený v indexu v době commitu v příkladu <<pr_git_commit>>.
+====
+
+Pokud následujeme příklady v této práci, tak pokud jsme použili stejný obsah a název souboru _README.txt_ jako v této práci, pak bychom měli mít stejné otisky jak objektu typu blob, tak i objektu typu strom. Pro objekt typu commit však naše otisky budou pravděpodobně odlišné. Otisk commitu je odlišný především kvůli datu commitu. Zjednodušené schéma objektů v objektové databázi ukazuje obrázek <<img_object_store_first_commit>>
+
+[[img_object_store_first_commit]]
+.Objektová databáze (zjednodušeno) [autor]
+image::object_first_commit.svg[Objektová databáze (zjednodušeno) [autor\]",scaledwidth=70%]
